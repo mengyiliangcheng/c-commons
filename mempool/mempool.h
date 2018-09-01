@@ -9,7 +9,25 @@
  *
  */
 
+#ifndef __COMMONS_MEMPOOL_H__
+#define __COMMONS_MEMPOOL_H__
+
+#define COMMONS_MEMPOOL_MAX_POOL_NUM    (100)
+#define COMMONS_MEMPOOL_MAX_POOL_SIZE   (4096)
+
+typedef struct
+{
+    s32* ptrBodyHead[COMMONS_MEMPOOL_MAX_POOL_NUM];
+    s32* ptrBodyTail[COMMONS_MEMPOOL_MAX_POOL_NUM];
+    s32  iBodySize[COMMONS_MEMPOOL_MAX_POOL_NUM];
+}ST_MEMPOOL_HEAD;
+
+typedef struct
+{
+    u8 heCheckSum[4];
+    u8* ptrBody;
+}ST_MEMPOOL_BODY;
 
 
-
+#endif
 
