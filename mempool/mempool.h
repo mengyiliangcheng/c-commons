@@ -17,6 +17,7 @@
 
 typedef struct
 {
+    s32  iTotalBodyNum;
     s32* ptrBodyHead[COMMONS_MEMPOOL_MAX_POOL_NUM];
     s32* ptrBodyTail[COMMONS_MEMPOOL_MAX_POOL_NUM];
     s32  iBodySize[COMMONS_MEMPOOL_MAX_POOL_NUM];

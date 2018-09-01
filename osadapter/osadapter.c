@@ -23,6 +23,15 @@ void* commons_malloc(s32 size)
 	return malloc();
 }
 
+void* commons_free(void* ptr)
+{
+    free(ptr);
+}
+
+void commons_memset(void* dest,s32 ch,s32 count)
+{
+    memset(dest,ch,count);
+}
 
 
 

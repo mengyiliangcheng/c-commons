@@ -36,7 +36,7 @@
 #undef NULL
 #define NULL (void*)0
 
-
+#define BZERO(dest,count)   (commons_memset(dest,0,count))
 
 
 
