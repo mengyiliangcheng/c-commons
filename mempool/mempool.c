@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include "osadapter.h"
 #include "mempool.h"
 
 static ST_MEMPOOL_HEAD _gstMempoolHead;
@@ -18,12 +19,12 @@ static pthread_mutex_t _gst_mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
 s32 mempool_malloc(s32 size)
 {
-    
+    return 0;
 }
 
 s32 mempool_free(void* ptr)
 {
-    
+    return 0;
 }
 
 ST_MEMPOOL_HEAD* getMempoolHead()
@@ -33,7 +34,7 @@ ST_MEMPOOL_HEAD* getMempoolHead()
 
 s32 mempool_checksum(const u8* src,s32 src_len,u8* checksum,s32 type)
 {
-    u8* ptr = NULL;
+    //u8* ptr = NULL;
 
     if(NULL == src || NULL == checksum)
     {
@@ -51,10 +52,10 @@ BOOL mempool_body_check(ST_MEMPOOL_BODY* body)
 BOOL mempool_check()
 {
     ST_MEMPOOL_BODY* body = NULL;
-    ST_MEMPOOL_HEAD head = getMempoolHead();
+    ST_MEMPOOL_HEAD* head = getMempoolHead();
     s32 num;
 
-    for(num = 0;num < head->iBodySize;num ++)
+    for(num = 0;num < COMMONS_MEMPOOL_MAX_POOL_NUM;num ++)
     {
         body = head->ptrBodyHead[num];
         if(mempool_body_check(body)){
@@ -62,6 +63,7 @@ BOOL mempool_check()
         }
         head->ptrBodyHead[num] = NULL;
     }
+	return TRUE;
 }
 
 ST_MEMPOOL_BODY* mempool_init_body()
@@ -71,7 +73,7 @@ ST_MEMPOOL_BODY* mempool_init_body()
     body = (ST_MEMPOOL_BODY*)commons_malloc(sizeof(ST_MEMPOOL_BODY));
     if(NULL == body)
     {
-        return -1;
+        return NULL;
     }
     BZERO(body,sizeof(ST_MEMPOOL_BODY));
 
@@ -79,7 +81,7 @@ ST_MEMPOOL_BODY* mempool_init_body()
     if(NULL == body->ptrBody)
     {
         commons_free(body);
-        return -1;
+        return NULL;
     }
     BZERO(body->ptrBody,sizeof(u8)*COMMONS_MEMPOOL_MAX_POOL_SIZE);
 
@@ -95,7 +97,7 @@ s32 mempool_init()
     pthread_mutex_lock(&_gst_mutex_lock);
 
     /*  check the validity of body,if valid,free the memory of body  */
-    for(num = 0;num < head->iBodySize;num ++)
+    for(num = 0;num < COMMONS_MEMPOOL_MAX_POOL_NUM;num ++)
     {
         body = head->ptrBodyHead[num];
         if(mempool_body_check(body)){
@@ -124,11 +126,11 @@ s32 mempool_init()
 
 s32 mempool_delete()
 {
-    
+    return 0;
 }
 
 s32 mempool_add()
 {
-    
+    return 0;
 }
 

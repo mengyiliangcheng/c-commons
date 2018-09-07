@@ -20,7 +20,7 @@ s32 commons_sprintf(char* buffer,const char* format,...)
 
 void* commons_malloc(s32 size)
 {
-	return malloc();
+	return malloc(size);
 }
 
 void* commons_free(void* ptr)

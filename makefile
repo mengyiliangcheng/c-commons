@@ -9,17 +9,28 @@
 CFLAGS += -g
 CFLAGS := -I$(shell pwd) -Wall 
 CFLAGS += -O2 
-#CFLAGS += -I/usr/include/sys
+
+CUR_PWD=$(shell pwd)
+
+HEAD_DIR = -I./mempool \
+           -I./string \
+           -I./example \
+		   -I./type \
+		   -I./osadapter
+SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
+	      $(CUR_PWD)/mempool/mempool.c \
+		  $(CUR_PWD)/osadapter/osadapter.c 
+
 OBJ = $(TARGET).o
-OBJ += $(INC:%.h=%.o)
-#SRC = *.c
-#OBJ += $(SRC:%.c=%.o)
+#OBJ += $(INC:%.h=%.o)
+CFLAGS += $(HEAD_DIR)
+OBJ += $(SRC_DIR:%.c=%.o)
 
 $(TARGET):$(OBJ)
-	gcc $(CFLAGS) $(OBJ) -o $(TARGET)
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET)
 
 %.o : %.c
-	gcc -c $(CFLAGS) $< #-o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 .PHONY:clean
 clean:

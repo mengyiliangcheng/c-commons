@@ -15,13 +15,7 @@
 #define COMMONS_MEMPOOL_MAX_POOL_NUM    (100)
 #define COMMONS_MEMPOOL_MAX_POOL_SIZE   (4096)
 
-typedef struct
-{
-    s32  iTotalBodyNum;
-    s32* ptrBodyHead[COMMONS_MEMPOOL_MAX_POOL_NUM];
-    s32* ptrBodyTail[COMMONS_MEMPOOL_MAX_POOL_NUM];
-    s32  iBodySize[COMMONS_MEMPOOL_MAX_POOL_NUM];
-}ST_MEMPOOL_HEAD;
+/****************************structure*******************************************/
 
 typedef struct
 {
@@ -29,6 +23,26 @@ typedef struct
     u8* ptrBody;
 }ST_MEMPOOL_BODY;
 
+typedef struct
+{
+    s32  iTotalBodyNum;
+    ST_MEMPOOL_BODY* ptrBodyHead[COMMONS_MEMPOOL_MAX_POOL_NUM];
+    u8* ptrBodyTail[COMMONS_MEMPOOL_MAX_POOL_NUM];
+    s32  iBodySize[COMMONS_MEMPOOL_MAX_POOL_NUM];
+}ST_MEMPOOL_HEAD;
+
+/****************************function*******************************************/
+
+
+extern s32 mempool_malloc(s32 size);
+
+extern s32 mempool_free(void* ptr);
+
+extern ST_MEMPOOL_BODY* mempool_init_body();
+
+extern s32 mempool_delete();
+
+extern s32 mempool_init();
 
 #endif
 

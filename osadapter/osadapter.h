@@ -11,6 +11,7 @@
 #ifndef __OSADAPTER_H__
 #define __OSADAPTER_H__
 
+/****************************macro*******************************************/
 #undef s32
 #define s32 int
 
@@ -24,7 +25,6 @@
 #define u8 unsigned char
 
 #undef BOOL
-#define BOOL
 #define BOOL int
 
 #undef TRUE
@@ -36,11 +36,18 @@
 #undef NULL
 #define NULL (void*)0
 
+#undef MIN
+#define MIN(a,b) (a < b ? a : b)
+
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
 
+/****************************function*******************************************/
 
+void* commons_malloc(s32 size);
 
+void* commons_free(void* ptr);
 
+void commons_memset(void* dest,s32 ch,s32 count);
 
 
 #endif

@@ -11,6 +11,7 @@ export TARGET='c-commons'
 echo $TARGET
 export INC="" 
 export SYS_INC=""
+export CC=gcc
 pwd=$PWD
 
 ARG1=$1
@@ -27,7 +28,7 @@ check()
     if [ $1 -eq 0 ]
     then
         echo -e "\nMake success !\nExecute the program !\n"
-        echo "--------------------------------------------"
+        echo -e "\n--------------------------------------------\n"
     else
         echo -e "\nMake error!\n"
         exit 1
@@ -39,7 +40,7 @@ mv $TARGET "$TARGET.elf"
 
 EXEC=$pwd/"$TARGET.elf"
 $EXEC $ARG1;
-echo "--------------------------------------------"
+echo -e "\n--------------------------------------------\n"
 
 
 
