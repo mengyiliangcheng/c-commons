@@ -17,6 +17,7 @@ HEAD_DIR = -I./mempool \
            -I./example \
 		   -I./type \
 		   -I./osadapter
+
 SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
 	      $(CUR_PWD)/mempool/mempool.c \
 		  $(CUR_PWD)/osadapter/osadapter.c 

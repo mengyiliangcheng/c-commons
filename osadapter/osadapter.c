@@ -15,6 +15,7 @@
 
 s32 commons_sprintf(char* buffer,const char* format,...)
 {
+
 	return 0;
 }
 
