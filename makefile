@@ -15,12 +15,14 @@ CUR_PWD=$(shell pwd)
 HEAD_DIR = -I./mempool \
            -I./string \
            -I./example \
-		   -I./type \
-		   -I./osadapter
+           -I./type \
+           -I./osadapter \
+           -I./string
 
 SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
-	      $(CUR_PWD)/mempool/mempool.c \
-		  $(CUR_PWD)/osadapter/osadapter.c 
+          $(CUR_PWD)/mempool/mempool.c \
+          $(CUR_PWD)/osadapter/osadapter.c \
+          $(CUR_PWD)/string/utils_string.c
 
 OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)
