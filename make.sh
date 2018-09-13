@@ -12,6 +12,7 @@ echo $TARGET
 export INC="" 
 export SYS_INC=""
 export CC=gcc
+GDB=gdb
 pwd=$PWD
 
 ARG1=$1
@@ -40,6 +41,20 @@ mv $TARGET "$TARGET.elf"
 
 EXEC=$pwd/"$TARGET.elf"
 $EXEC $ARG1;
+RET=$?
+
+check_execut()
+{
+    if [ $1 -ne 0 ]
+    then
+        echo -e "\nExecute Program Failed !\n"
+        $GDB $EXEC $ARG1
+    else
+        echo -e "\nExecute Program Success !\n"
+    fi
+    return 0
+}
+check_execut $RET
 echo -e "\n--------------------------------------------\n"
 
 

@@ -8,24 +8,19 @@
  * limitations under the License.
  *
  */
-#ifndef __OSADAPTER_H__
-#define __OSADAPTER_H__
+#ifndef __COMMONS_OSADAPTER_H__
+#define __COMMONS_OSADAPTER_H__
 
 /****************************macro*******************************************/
-#undef s32
-#define s32 int
+typedef int s32;
 
-#undef u32 
-#define u32 unsigned int
+typedef unsigned int u32;
 
-#undef s8
-#define s8 char
+typedef char s8;
 
-#undef u8
-#define u8 unsigned char
+typedef unsigned char u8;
 
-#undef BOOL
-#define BOOL int
+typedef int BOOL;
 
 #undef TRUE
 #define TRUE 1
@@ -43,12 +38,15 @@
 
 /****************************function*******************************************/
 
-void* commons_malloc(s32 size);
+extern void* commons_malloc(s32 size);
 
-void* commons_free(void* ptr);
+extern void commons_free(void* ptr);
 
-void commons_memset(void* dest,s32 ch,s32 count);
+extern void commons_memset(void* dest,s32 ch,s32 count);
 
+extern s32 commons_println(const char* format, ...);
+
+extern s32 commons_print_hex(const void* src,int src_len);
 
 #endif
 

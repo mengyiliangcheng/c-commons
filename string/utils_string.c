@@ -13,7 +13,7 @@
 #include "osadapter.h"
 #include "utils_string.h"
 
-static u8 hex_table[16] = {'1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+//static u8 hex_table[16] = {'1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
 /*
 *description:convert string data to hex data: "1a2b3c" ==> \x1a \x2b \x3c
@@ -22,41 +22,47 @@ static u8 hex_table[16] = {'1','2','3','4','5','6','7','8','9','a','b','c','d','
 s32 strings_to_hex(const u8* src,s32 src_len,u8* dest)
 {
     u8 ch;
-    u8* ptr = NULL
+    u8* ptr = NULL;
     u8* dest_ptr = NULL;
     if(NULL == src || NULL == dest){
         return -4;
     }
+    //commons_println("src:%s",src);
     ptr = src;
     dest_ptr = dest;
     while(src_len > 1){
-        if(*ptr >= 40 && *ptr <= 49){
-            ch = ((*ptr) - 40) << 4;
+        ch = 0;
+        if(*ptr >= '0' && *ptr <= '9'){
+            ch = ((*ptr) - '0') << 4;
         }else if(*ptr >= 'a' && *ptr <= 'f')
         {
-            ch = ((*ptr) - 'a') << 4;
+            ch = ((*ptr) - 'a' + 10) << 4;
         }else if(*ptr >= 'A' && *ptr <= 'F')
         {
-            ch = ((*ptr) - 'A') << 4;
+            ch = ((*ptr) - 'A' + 10) << 4;
         }else{
             return -2;
         }
-        
+        //commons_println("ptr:%c",*ptr);
+        //commons_println("ch:%02x",ch);
         ptr ++;
+        
 
-        if(*ptr >= 40 && *ptr <= 49){
-            ch += *ptr - 40;
+        if(*ptr >= '0' && *ptr <= '9'){
+            ch += *ptr - '0';
         }else if (*ptr >= 'a' && *ptr <= 'f')
         {
-            ch += *ptr - 'a';
+            ch += *ptr - 'a' + 10;
         }else if (*ptr >= 'A' && *ptr <= 'F')
         {
-            ch += *ptr - 'A';
+            ch += *ptr - 'A' + 10;
         }else{
             return -2;
         }
         ptr ++;
-
+        
+        //commons_println("ptr:%c",*ptr);
+        //commons_println("ch:%02x",ch);
         *dest_ptr = ch;
         dest_ptr ++;
         
@@ -65,14 +71,14 @@ s32 strings_to_hex(const u8* src,s32 src_len,u8* dest)
 
     if(1 == src_len)
     {
-        if(*ptr >= 40 && *ptr <= 49){
-            ch = ((*ptr) - 40) << 4;
+        if(*ptr >= '0' && *ptr <= '9'){
+            ch = ((*ptr) - '0') << 4;
         }else if(*ptr >= 'a' && *ptr <= 'f')
         {
-            ch = ((*ptr) - 'a') << 4;
+            ch = ((*ptr) - 'a' + 10) << 4;
         }else if(*ptr >= 'A' && *ptr <= 'F')
         {
-            ch = ((*ptr) - 'A') << 4;
+            ch = ((*ptr) - 'A' + 10) << 4;
         }else{
             return -2;
         }
