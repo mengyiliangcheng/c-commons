@@ -29,9 +29,25 @@ int testStringToHex()
     return 0;
 }
 
+int testMempool()
+{
+    int ret;
+    char* ptr = NULL;
+    ret = mempool_init(); 
+    commons_println("mempool init ret=%d",ret); 
+    
+    ptr = mempool_malloc(100);
+    if(NULL == ptr)
+    {
+        commons_println("malloc failed");
+    }
+} 
+
+
 ST_TEST_LIST TabTestList[] =
 {
-    {"test strings_to_hex",testStringToHex}
+    {"test strings_to_hex",        testStringToHex},
+    {"test mempool",               testMempool }
     
 };
 

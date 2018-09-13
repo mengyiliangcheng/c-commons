@@ -14,11 +14,52 @@
 #include "osadapter.h"
 #include "mempool.h"
 
+/**********************************************/
+/*          HEAD                              */
+/* |--------------------|                     */
+/* | number of nodes    |      _____________  */
+/* |--------------------|      |  node 1   |  */
+/* | node1 head ptr     |----->|-----------|  */
+/* |--------------------|      |check sum  |  */
+/* | node1 tail ptr     |---|  |           |  */
+/* |--------------------|   |  |-----^-----|  */
+/* | node2 head ptr     |   |        |        */
+/* |--------------------|   |  |-----------|  */
+/* | node2 tail ptr     |   |  |   memory  |  */
+/* |--------------------|   |->|-----------|  */
+/*                                            */
+/**********************************************/
 static ST_MEMPOOL_HEAD _gstMempoolHead;
 static pthread_mutex_t _gst_mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
-s32 mempool_malloc(s32 size)
+void* mempool_malloc(s32 size)
 {
+    s32 i;
+    ST_MEMPOOL_HEAD* head = getMempoolHead();
+    ST_MEMPOOL_BODY* body = NULL;
+    u8* ptr = NULL;
+    if(0 == head->iTotalBodyNum)
+    {
+        mempool_init();
+    }
+
+    if(size > COMMONS_MEMPOOL_MAX_POOL_SIZE)
+    {
+        return -1;
+    }
+
+    for(i = 0;i < head->iTotalBodyNum;i ++)
+    {
+        if(head->iBodySize[i] + size <  COMMONS_MEMPOOL_MAX_POOL_SIZE)
+        {
+            head->iBodySize[i] += size;
+            ptr = head->ptrBodyTail[i];
+            head->ptrBodyTail[i] += size;
+            return ptr;
+        }
+    }
+    
+    
     return 0;
 }
 
@@ -76,7 +117,7 @@ ST_MEMPOOL_BODY* mempool_init_body()
         return NULL;
     }
     BZERO(body,sizeof(ST_MEMPOOL_BODY));
-
+#if 0
     body->ptrBody = (u8*)commons_malloc(sizeof(u8)*COMMONS_MEMPOOL_MAX_POOL_SIZE);
     if(NULL == body->ptrBody)
     {
@@ -84,7 +125,7 @@ ST_MEMPOOL_BODY* mempool_init_body()
         return NULL;
     }
     BZERO(body->ptrBody,sizeof(u8)*COMMONS_MEMPOOL_MAX_POOL_SIZE);
-
+#endif
     return body;
 }
 

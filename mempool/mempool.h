@@ -20,7 +20,7 @@
 typedef struct
 {
     u8 heCheckSum[4];
-    u8* ptrBody;
+    u8 ptrBody[COMMONS_MEMPOOL_MAX_POOL_SIZE] ;
 }ST_MEMPOOL_BODY;
 
 typedef struct
@@ -34,7 +34,7 @@ typedef struct
 /****************************function*******************************************/
 
 
-extern s32 mempool_malloc(s32 size);
+extern void* mempool_malloc(s32 size);
 
 extern s32 mempool_free(void* ptr);
 
@@ -43,6 +43,8 @@ extern ST_MEMPOOL_BODY* mempool_init_body();
 extern s32 mempool_delete();
 
 extern s32 mempool_init();
+
+extern ST_MEMPOOL_HEAD* getMempoolHead();
 
 #endif
 
