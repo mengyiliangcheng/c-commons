@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <fcntl.h>
 #include "osadapter.h"
 
 s32 commons_sprintf(s8* buffer,const s8* format,...)
@@ -38,7 +39,7 @@ s32 commons_print(const s8* format, ...)
     va_end(ap);
 }
 
-s32 commons_print_hex(const void* src,int src_len)
+s32 commons_print_hex(const void* src,s32 src_len)
 {
     s32 i;
     u8* ptr = NULL;
@@ -53,6 +54,66 @@ s32 commons_print_hex(const void* src,int src_len)
     }
     return 0;
 }
+
+
+s32 commons_scanf(s8* dest,s32 dest_len,s32 type)
+{
+    s8* tmp = NULL;
+    s8* dest_ptr = NULL;
+    s8 cmd[128] = {0};
+    s32 i;
+    s32 len;
+    s8 ch;
+    if(NULL == dest || dest_len <= 0){
+        return -1;
+    }
+    
+    tmp = (s8* )commons_malloc(sizeof(s8) * dest_len);
+    if(NULL == tmp){
+        return -1;
+    }
+    BZERO(tmp,sizeof(s8) * dest_len);
+
+    sprintf(cmd,"\%%%ds",dest_len);
+    scanf(cmd,tmp);
+    if(strlen(tmp) > sizeof(tmp) * dest_len){
+        COMMONS_OS_LOG("overstack !");
+        return -1;
+    }
+    
+    i = 0;
+    dest_ptr = dest;
+    len = 0;
+    while(i < strlen(tmp)){
+        ch = *(tmp + i);
+        if('\n' == ch){
+            break;
+        }
+        if(8 == ch){
+            i ++;
+            if(dest_ptr == dest){
+                continue;
+            }
+            dest_ptr --;
+            *dest_ptr = 0;
+            continue;
+        }
+        if((SCANF_NUMBER == type) && (ch < '0' || ch > '9')){
+            COMMONS_OS_LOG("%d not number !",ch);
+            i++;
+            continue;
+        }
+        *dest_ptr = ch;
+        dest_ptr ++;
+        i ++;
+        len ++;
+    }
+    if(SCANF_NUMBER == type && 0 == strlen(dest)){
+        COMMONS_OS_LOG("no number !");
+    }
+    return len;
+}
+
 
 void* commons_malloc(s32 size)
 {
@@ -76,6 +137,22 @@ void commons_memset(void* dest,s32 ch,s32 count)
     memset(dest,ch,count);
 }
 
+int commons_rand()
+{
+    int randnum = 0;
+    int fd = open("/dev/urandom", O_RDONLY);
+    if(-1 == fd)
+    {
+        COMMONS_OS_LOG("open /dev/urandon failed");
+        return rand();
+    }
+
+    read(fd, (char *)&randnum, sizeof(int));
+    close(fd);
+
+    return randnum;
+ 
+}
 
 
 

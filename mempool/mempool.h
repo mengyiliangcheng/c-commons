@@ -12,8 +12,13 @@
 #ifndef __COMMONS_MEMPOOL_H__
 #define __COMMONS_MEMPOOL_H__
 
+/****************************macro*******************************************/
+
 #define COMMONS_MEMPOOL_MAX_POOL_NUM    (100)
 #define COMMONS_MEMPOOL_MAX_POOL_SIZE   (4096)
+
+#define COMMONS_MEM_LOG(...) COMMONS_LOG("MEM",__VA_ARGS__);
+
 
 /****************************structure*******************************************/
 
@@ -45,6 +50,8 @@ extern s32 mempool_delete();
 extern s32 mempool_init();
 
 extern ST_MEMPOOL_HEAD* getMempoolHead();
+
+extern s32 mempool_add();
 
 #endif
 

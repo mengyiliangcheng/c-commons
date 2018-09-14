@@ -7,7 +7,7 @@
 #***************************************************/ 
 
 CFLAGS += -g
-CFLAGS := -I$(shell pwd) -Wall 
+CFLAGS := -I$(shell pwd) 
 CFLAGS += -O2
 
 DYNAMIC_LIBS = 
@@ -17,16 +17,17 @@ CUR_PWD=$(shell pwd)
 HEAD_DIR = -I./mempool \
            -I./string \
            -I./example \
-           -I./type \
            -I./osadapter \
            -I./string \
-           -I./log
+           -I./log \
+           -I./file
 
 SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
           $(CUR_PWD)/mempool/mempool.c \
           $(CUR_PWD)/osadapter/osadapter.c \
           $(CUR_PWD)/string/utils_string.c \
-          $(CUR_PWD)/log/commons_log.c
+          $(CUR_PWD)/log/commons_log.c \
+          $(CUR_PWD)/file/utils_file.c
 
 OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)

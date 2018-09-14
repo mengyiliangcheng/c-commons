@@ -35,32 +35,54 @@ static pthread_mutex_t _gst_mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 void* mempool_malloc(s32 size)
 {
     s32 i;
+    s32 ret;
     ST_MEMPOOL_HEAD* head = getMempoolHead();
     ST_MEMPOOL_BODY* body = NULL;
     u8* ptr = NULL;
-    if(0 == head->iTotalBodyNum)
-    {
-        mempool_init();
+
+    if(size > COMMONS_MEMPOOL_MAX_POOL_SIZE){
+        COMMONS_MEM_LOG("add failed,too large size");
+        return -1;
     }
 
-    if(size > COMMONS_MEMPOOL_MAX_POOL_SIZE)
+    pthread_mutex_lock(&_gst_mutex_lock);
+
+    if(0 == head->iTotalBodyNum)
     {
-        return -1;
+        if(0 != mempool_init()){
+            COMMONS_MEM_LOG("init failed");
+            pthread_mutex_unlock(&_gst_mutex_lock);
+            return -1;
+        }
     }
 
     for(i = 0;i < head->iTotalBodyNum;i ++)
     {
+        COMMONS_MEM_LOG("i:%d",i);
         if(head->iBodySize[i] + size <  COMMONS_MEMPOOL_MAX_POOL_SIZE)
         {
+            if(NULL == head->ptrBodyHead[i])
+            {
+                ret = mempool_add();
+                if(ret < 0){
+                    COMMONS_MEM_LOG("add failed");
+                    pthread_mutex_unlock(&_gst_mutex_lock);
+                    return NULL;
+                }
+                i = 0;
+            }
             head->iBodySize[i] += size;
             ptr = head->ptrBodyTail[i];
             head->ptrBodyTail[i] += size;
+            COMMONS_MEM_LOG("add failed");
             return ptr;
         }
     }
-    
-    
-    return 0;
+
+    pthread_mutex_unlock(&_gst_mutex_lock);
+
+    COMMONS_MEM_LOG("not enough memory");
+    return NULL;
 }
 
 s32 mempool_free(void* ptr)
@@ -117,15 +139,7 @@ ST_MEMPOOL_BODY* mempool_init_body()
         return NULL;
     }
     BZERO(body,sizeof(ST_MEMPOOL_BODY));
-#if 0
-    body->ptrBody = (u8*)commons_malloc(sizeof(u8)*COMMONS_MEMPOOL_MAX_POOL_SIZE);
-    if(NULL == body->ptrBody)
-    {
-        commons_free(body);
-        return NULL;
-    }
-    BZERO(body->ptrBody,sizeof(u8)*COMMONS_MEMPOOL_MAX_POOL_SIZE);
-#endif
+
     return body;
 }
 
@@ -153,6 +167,7 @@ s32 mempool_init()
     body= mempool_init_body();
     if(NULL == body)
     {
+        pthread_mutex_unlock(&_gst_mutex_lock);
         return -1;
     }
     head->iBodySize[0] = 0;
@@ -172,6 +187,33 @@ s32 mempool_delete()
 
 s32 mempool_add()
 {
-    return 0;
+    ST_MEMPOOL_BODY* body = NULL;
+    ST_MEMPOOL_HEAD* head = getMempoolHead();
+    s32 i;
+    s32 ret = -1;
+    
+    COMMONS_MEM_LOG("add mempool");
+
+    pthread_mutex_lock(&_gst_mutex_lock);
+
+    for(i = 0;i < COMMONS_MEMPOOL_MAX_POOL_SIZE;i ++)
+    {
+        if(NULL == head->ptrBodyHead[i]){
+            body = mempool_init_body();
+            if(NULL == body){
+                ret = -1;
+                break;
+            }
+            head->ptrBodyHead[i] = body;
+            head->ptrBodyTail[i] = body->ptrBody;
+            head->iBodySize[i] = 0;
+            head->iTotalBodyNum ++;
+            ret = 0;
+            break;
+        }
+    }
+    
+    pthread_mutex_unlock(&_gst_mutex_lock);
+    return ret;
 }
 

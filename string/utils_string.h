@@ -12,6 +12,7 @@
 #ifndef __UTILS_STRING_H__
 #define __UTILS_STRING_H__
 
+#include "string.h"
 #include "osadapter.h"
 
 s32 strings_to_hex(const u8* src,s32 src_len,u8* dest);

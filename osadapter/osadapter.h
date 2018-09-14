@@ -11,30 +11,24 @@
 #ifndef __COMMONS_OSADAPTER_H__
 #define __COMMONS_OSADAPTER_H__
 
+/****************************headers*******************************************/
+#include "commons_log.h"
+
 /****************************macro*******************************************/
-typedef int s32;
-
-typedef unsigned int u32;
-
-typedef char s8;
-
-typedef unsigned char u8;
-
-typedef int BOOL;
-
-#undef TRUE
-#define TRUE 1
-
-#undef FALSE
-#define FALSE 0
-
-#undef NULL
-#define NULL (void*)0
 
 #undef MIN
 #define MIN(a,b) (a < b ? a : b)
 
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
+
+#define COMMONS_OS_LOG(...) COMMONS_LOG("osadapter",__VA_ARGS__);
+
+typedef enum
+{
+    SCANF_STRING,
+    SCANF_NUMBER,
+}E_SCANF_TYPE;
+
 
 /****************************function*******************************************/
 
@@ -47,6 +41,8 @@ extern void commons_memset(void* dest,s32 ch,s32 count);
 extern s32 commons_println(const char* format, ...);
 
 extern s32 commons_print_hex(const void* src,int src_len);
+
+extern int commons_rand();
 
 #endif
 

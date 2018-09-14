@@ -14,9 +14,9 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include "commons_type.h"
+#include "commons_log.h"
 
-#define COMMONS_LOG_FILE  "/data/linkedlist.log" 
+#define COMMONS_LOG_FILE  "./log/linkedlist.log" 
 
 
 u8* commons_get_shortname(u8* path)
@@ -45,20 +45,20 @@ s32 commons_log(const u8* module,const u8* format, ...)
 {
     va_list ap;
     s32 ret;    
-    static FILE *fp = NULL;
+    //static FILE *fp = NULL;
 
-    printf("[%s]  ",module);
+    printf("[%s] ",module);
     va_start(ap, format);
+    
     ret = vprintf(format, ap);
-
-    if(NULL == fp){
-        fp = fopen(COMMONS_LOG_FILE, "a+");
-    }
-    ret = vfprintf(fp, format, ap);
+    //if(NULL == fp){
+    //    fp = fopen(COMMONS_LOG_FILE, "a+");
+    //}
+    //ret = vfprintf(fp, format, ap);
     va_end(ap);
     printf("\n");
-    fclose(fp);
-    fp = NULL;
+    //fclose(fp);
+    //fp = NULL;
 
     return ret;
 }

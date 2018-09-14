@@ -93,6 +93,133 @@ s32 strings_hex_to_str(const u8* src,s32 src_len,u8* dest)
     
 }
 
+void strings_replace_first(s8* str1,s8* str2,s8* str3)  
+{
+    if(NULL == str1 || NULL == str2 || NULL == str3){
+        return ;
+    }
+    s8 str4[strlen(str1)+1];  
+    s8* p;
+    
+    strcpy(str4,str1);  
+    if((p=strstr(str1,str2))!=NULL)
+    {
+        while(str1!=p&&str1!=NULL)
+        {
+            str1++;  
+        }
+        str1[0]='\0';
+        strcat(str1,str3);
+        strcat(str1,strstr(str4,str2)+strlen(str2));
+    }
+}  
+
+
+void strings_replace(char *str1,char *str2,char *str3)  
+{
+    while(strstr(str1,str2)!=NULL)
+    {
+        strings_replace_first(str1,str2,str3);
+    }
+}
+
+/*截取src字符串中,从下标为start开始到end-1(end前面)的字符串保存在dest中(下标从0开始)*/  
+void strings_substring(char *dest,char *src,int start,int end)  
+{
+    int i=start;
+    if(start>strlen(src))
+        return;
+    if(end>strlen(src))
+        end=strlen(src);
+    while(i<end)
+    {
+        dest[i-start]=src[i];
+        i++;
+    }
+    dest[i-start]='\0';
+    return;
+}
+
+/*返回src中下标为index的字符*/  
+char strings_char_at(char *src,int index)
+{
+    char *p=src;
+    int i=0;
+    if(index<0||index>strlen(src))
+        return 0;
+    while(i<index)i++;
+    return p[i];
+}
+
+/*返回str2第一次出现在str1中的位置(下表索引),不存在返回-1*/  
+int strings_indexOf(char *str1,char *str2)
+{
+    char *p=str1;
+    int i=0;
+    p=strstr(str1,str2);
+    if(p==NULL)
+        return -1;
+    else{
+        while(str1!=p)
+        {
+            str1++;
+            i++;
+        }
+    }
+    return i;
+}  
+/*返回str1中最后一次出现str2的位置(下标),不存在返回-1*/  
+int strings_lastIndexOf(char *str1,char *str2)  
+{
+    char *p=str1;
+    int i=0,len=strlen(str2);
+    p=strstr(str1,str2);
+    if(p==NULL)return -1;
+    while(p!=NULL)
+    {
+        for(;str1!=p;str1++)i++;
+        p=p+len;
+        p=strstr(p,str2);
+    }
+    return i;
+}
+
+void strings_ltrim(char *str)
+{
+    int i=0,j,len=strlen(str);
+    while(str[i]!='\0')
+    {
+        if(str[i]!=32&&str[i]!=9)
+            break;/*32:空格,9:横向制表符*/  
+        i++;
+    }
+    if(i!=0)
+    for(j=0;j<=len-i;j++)
+    {
+        str[j]=str[j+i];/*将后面的字符顺势前移,补充删掉的空白位置*/  
+    }
+}
+
+/*删除str最后一个非空白字符后面的所有空白字符(空格符和横向制表符)*/  
+void strings_rtrim(char *str)
+{
+    char *p=str;
+    int i=strlen(str)-1;
+    while(i>=0)
+    {
+        if(p[i]!=32&&p[i]!=9)
+            break;
+        i--;
+    }
+    str[++i]='\0';
+}
+
+/*删除str两端的空白字符*/  
+void strings_trim(char *str)
+{
+    strings_ltrim(str);
+    strings_rtrim(str);
+}
 
 
 
