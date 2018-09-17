@@ -6,9 +6,14 @@
 #*version           :1.0
 #***************************************************/ 
 
-CFLAGS += -g
-CFLAGS := -I$(shell pwd) 
+CFLAGS += -g -fPIC
+CFLAGS += -I$(shell pwd) 
 CFLAGS += -O2
+ifeq ($(COMPILE_TYPE),shared)
+    CFLAGS += -shared 
+else
+    OBJ = $(TARGET).o 
+endif
 
 DYNAMIC_LIBS = 
 
@@ -29,7 +34,7 @@ SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
           $(CUR_PWD)/log/commons_log.c \
           $(CUR_PWD)/file/utils_file.c
 
-OBJ = $(TARGET).o
+#OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)
 CFLAGS += $(HEAD_DIR)
 CFLAGS += $(DYNAMIC_LIBS)

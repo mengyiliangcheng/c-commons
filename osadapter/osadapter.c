@@ -18,7 +18,13 @@
 
 s32 commons_sprintf(s8* buffer,const s8* format,...)
 {
-
+    if(NULL == buffer){
+        return -1;
+    }
+    va_list ap;
+    va_start(ap,format);
+    vsprintf(buffer,format,ap);
+    va_end(ap);
 	return 0;
 }
 
@@ -59,6 +65,9 @@ s32 commons_print_hex(const void* src,s32 src_len)
 void commons_flush(FILE *fp)
 {
     int ch;
+    if(NULL == fp){
+        return ;
+    }
 	while( (ch = fgetc(fp)) != EOF && ch != '\n');
 }
 
@@ -178,5 +187,8 @@ s32 commons_rand_str(s8* pheOut,s32 iLen)
     
     return 0;
 }
+
+
+
 
 

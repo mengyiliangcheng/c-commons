@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include "commons_log.h"
 
-#define COMMONS_LOG_FILE  "./log/linkedlist.log" 
+#define COMMONS_LOG_FILE  "./log/commons.log" 
 
 
 u8* commons_get_shortname(u8* path)

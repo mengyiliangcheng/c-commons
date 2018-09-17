@@ -12,6 +12,7 @@ echo $TARGET
 export INC="" 
 export SYS_INC=""
 export CC=gcc
+export COMPILE_TYPE="exe"    #exe/shared/static
 GDB=gdb
 pwd=$PWD
 
@@ -36,7 +37,13 @@ check()
     fi
     return 0
 }
+
 check $RET
+if [ $COMPILE_TYPE = "shared" ] 
+then
+   mv $TARGET "$TARGET.so"
+   exit 0
+fi
 mv $TARGET "$TARGET.elf"
 
 EXEC=$pwd/"$TARGET.elf"
