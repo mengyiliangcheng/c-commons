@@ -56,6 +56,13 @@ s32 commons_print_hex(const void* src,s32 src_len)
 }
 
 
+void commons_flush(FILE *fp)
+{
+    int ch;
+	while( (ch = fgetc(fp)) != EOF && ch != '\n');
+}
+
+
 s32 commons_scanf(s8* dest,s32 dest_len,s32 type)
 {
     s8* tmp = NULL;
@@ -75,7 +82,8 @@ s32 commons_scanf(s8* dest,s32 dest_len,s32 type)
     BZERO(tmp,sizeof(s8) * dest_len);
 
     sprintf(cmd,"\%%%ds",dest_len);
-    scanf(cmd,tmp);
+    scanf(cmd,tmp);    
+    commons_flush(stdin);
     if(strlen(tmp) > sizeof(tmp) * dest_len){
         COMMONS_OS_LOG("overstack !");
         return -1;
@@ -137,10 +145,10 @@ void commons_memset(void* dest,s32 ch,s32 count)
     memset(dest,ch,count);
 }
 
-int commons_rand()
+s32 commons_rand()
 {
-    int randnum = 0;
-    int fd = open("/dev/urandom", O_RDONLY);
+    s32 randnum = 0;
+    s32 fd = open("/dev/urandom", O_RDONLY);
     if(-1 == fd)
     {
         COMMONS_OS_LOG("open /dev/urandon failed");
@@ -154,6 +162,21 @@ int commons_rand()
  
 }
 
+s32 commons_rand_str(s8* pheOut,s32 iLen)
+{
+    int i;
+    unsigned char ch;
+    if(iLen <= 0 || NULL == pheOut){
+        COMMONS_OS_LOG("param error");
+        return -4;
+    }
 
+    for(i = 0;i < iLen;i ++){
+        ch = commons_rand() % 16;
+        sprintf(&pheOut[i*2],"%02X",ch);
+    }
+    
+    return 0;
+}
 
 

@@ -43,7 +43,7 @@ $(TARGET):$(OBJ)
 
 .PHONY:clean
 clean:
-	rm -f *.o *.out *.elf ./*/*.o
+	rm -f *.o *.out *.elf ./*/*.o ./*/*.swo ./*/*.swp
 
 
 

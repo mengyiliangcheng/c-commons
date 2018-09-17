@@ -42,7 +42,7 @@ int testCommonsScanf()
     if(ret <= 0){
         commons_println("input error");
     }
-    
+    commons_println("input: %s",tmp);
 }
 
 int testMempool()
@@ -69,11 +69,24 @@ int testMempool()
 } 
 
 
+int testCommonsRandStr()
+{
+    int len = 512;
+    char tmp[1025] = {0};
+    commons_rand_str(tmp,len);
+    commons_println(tmp);
+}
+int testOthers()
+{
+    
+}
 ST_TEST_LIST TabTestList[] =
 {
     {"test strings_to_hex",        testStringToHex},
     {"test mempool",               testMempool },
-    {"test commons_scanf",         testCommonsScanf}
+    {"test commons_scanf",         testCommonsScanf},
+    {"test commons_rand_str",      testCommonsRandStr},
+    {"test others",                testOthers}
     
 };
 
@@ -109,6 +122,11 @@ int testProgramProcess(void)
         if(num <= 0 || num > TEST_TABLE_SIZE)
         {
             commons_println("input error!!!");
+            continue;
+        }
+        if(NULL == TabTestList[num - 1].fun)
+        {
+            commons_println("no function");
             continue;
         }
         TabTestList[num - 1].fun();
