@@ -20,5 +20,7 @@
  /****************************function*******************************************/
  
  extern BOOL file_exist(s8* file_path);
+
+ extern s32 utils_file_size(s8* file_path);
  
  #endif

@@ -13,6 +13,7 @@
 
 /****************************headers*******************************************/
 #include "commons_log.h"
+#include <assert.h>
 
 /****************************macro*******************************************/
 
@@ -22,6 +23,8 @@
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
 
 #define COMMONS_OS_LOG(...) COMMONS_LOG("osadapter",__VA_ARGS__);
+
+#define Assert(x) assert(x)
 
 typedef enum
 {

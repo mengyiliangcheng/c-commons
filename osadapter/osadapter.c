@@ -30,6 +30,10 @@ s32 commons_sprintf(s8* buffer,const s8* format,...)
 
 s32 commons_println(const s8* format, ...)
 {
+    if(NULL == format)
+    {
+        return -1;
+    }
     va_list ap;
     va_start(ap,format);
     vprintf(format,ap);
@@ -58,6 +62,7 @@ s32 commons_print_hex(const void* src,s32 src_len)
     {
         commons_print("%02X ",ptr[i]);
     }
+    commons_println("");
     return 0;
 }
 

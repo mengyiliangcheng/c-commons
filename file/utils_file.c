@@ -79,5 +79,25 @@ s32 file_read(s8* file_path,s8* out,s32 len)
 }
 
 
+s32 utils_file_size(s8* file_path)
+{
+    if(NULL == file_path)
+    {
+        return -1;
+    }
+
+    FILE* fp = NULL;
+    s32 ret;
+
+    fp = fopen(file_path,"rb");
+    if(NULL == fp){
+        return -1;
+    }
+    fseek(fp,0L,SEEK_END);
+    ret = ftell(fp);
+
+    return ret;
+}
+
 
  

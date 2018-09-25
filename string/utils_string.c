@@ -10,6 +10,8 @@
  */
 
 #include <stdlib.h>
+#include <limits.h>
+#include <assert.h>
 #include "osadapter.h"
 #include "utils_string.h"
 
@@ -93,6 +95,125 @@ s32 strings_hex_to_str(const u8* src,s32 src_len,u8* dest)
     
 }
 
+s32 strings_len(const s8* str)
+{
+    s32 i;
+    if(NULL == str)
+    {
+        Assert(str);
+        return -1;
+    }
+
+    i = 0;
+    while(*str)
+    {
+        i++;
+        str++;
+        if(i >= (INT_MAX-1)) break;
+    }
+    return i;
+}
+
+void strings_copy(s8* dest,const s8* src,s32 dest_size)
+{
+    if(NULL == dest || NULL == src || dest_size <= 1)
+    {
+        Assert(dest);
+        Assert(src);
+        Assert(dest_size > 1);
+        return -1;
+    }
+
+    while(*src && dest_size > 1){
+        *dest++ = *src++;
+        dest_size --;
+    }
+    *dest = 0;
+}
+
+void strings_concat(s8* dest,const s8* src)
+{
+    if(NULL == dest || NULL == src)
+    {
+        Assert(dest);
+        Assert(src);
+        return;
+    }
+
+    while(*dest) dest++;
+
+    while(*src)
+    {
+        *dest++ = *src++;
+    }
+    *dest = 0;
+}
+
+void strings_concat_s(s8* dest,const s8* src,s32 dest_size)
+{
+    if(NULL == dest || NULL == src || dest_size <= 1)
+    {
+        Assert(dest);
+        Assert(src);
+        Assert(dest_size > 1);
+        return;
+    }
+
+    while(*dest) 
+    {
+        dest++;
+        dest_size --;
+        if(dest_size <= 0) return ;
+    }
+
+    while(*src)
+    {
+        *dest++ = *src++;
+        
+        dest_size --;
+        if(dest_size <= 0) return ;
+    }
+    *dest = 0;
+}
+
+s32 strings_compare(const s8* str1,const s8* str2)
+{
+    if(NULL == str1 || NULL == str2)
+    {
+        Assert(str1);
+        Assert(str2);
+    }
+
+    while(*str1 == *str2 && *str1 && *str2)
+    {
+        str1++;
+        str2++;
+    }
+
+    return *str1 - *str2;
+}
+
+s32 strings_compare_s(const s8* str1,const s8* str2,s32 len)
+{
+    if(NULL == str1 || NULL == str2 || len <= 0)
+    {
+        Assert(str1);
+        Assert(str2);
+        Assert(len > 0);
+    }
+
+    while(*str1 == *str2 && *str1 && *str2)
+    {
+        len --;
+        if(len <= 0) break;
+        str1++;
+        str2++;
+    }
+
+    return *str1 - *str2;
+}
+
+
 void strings_replace_first(s8* str1,s8* str2,s8* str3)  
 {
     if(NULL == str1 || NULL == str2 || NULL == str3){
@@ -124,20 +245,43 @@ void strings_replace(char *str1,char *str2,char *str3)
 }
 
 /*截取src字符串中,从下标为start开始到end-1(end前面)的字符串保存在dest中(下标从0开始)*/  
-void strings_substring(char *dest,char *src,int start,int end)  
+void strings_substringxx(char *dest,char *src,int start,int end)  
 {
-    int i=start;
-    if(start>strlen(src))
+    
+    
+    s32 i = start;
+    if(start > strings_len(src))
         return;
-    if(end>strlen(src))
-        end=strlen(src);
-    while(i<end)
+    if(end > strings_len(src))
+        end=strings_len(src);
+    while(i < end)
     {
         dest[i-start]=src[i];
         i++;
     }
     dest[i-start]='\0';
     return;
+}
+
+void strings_substring(s8* dest,const s8* src,s32 pos,s32 len)
+{
+    if(NULL == dest || NULL == src || pos < 0 || len <= 0)
+    {
+        Assert(dest);
+        Assert(src);
+        Assert(len > 0);
+        Assert(pos > 0);
+        return ;
+    }
+
+    while(*src && pos--) src++;
+    if(!*src) return;
+
+    while(*src && len--)
+    {
+        *dest++ = *src++;
+    }
+    *dest = 0;
 }
 
 /*返回src中下标为index的字符*/  
