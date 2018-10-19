@@ -139,7 +139,22 @@ s32 commons_scanf(s8* dest,s32 dest_len,s32 type)
 
 void* commons_malloc(s32 size)
 {
-	return malloc(size);
+    void* ptr = NULL;
+    if(size <= 0)
+    {
+        Assert(size > 0);
+        return NULL;
+    }
+    
+	ptr = malloc(size);
+    if(!ptr)
+    {
+        return NULL;
+    }
+
+    commons_memset(ptr,0,size);
+    
+    return ptr;
 }
 
 void commons_free(void* ptr)

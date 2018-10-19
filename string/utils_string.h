@@ -15,6 +15,18 @@
 #include "string.h"
 #include "osadapter.h"
 
+/****************************macro**********************************************/
+#define UTILS_STRINGS_MAX_LEN 128
+
+/****************************structure**********************************************/
+typedef struct
+{
+    s8* str;
+    int length;
+}ST_UTILS_STRINGS;
+
+/****************************function**********************************************/
+
 s32 strings_to_hex(const u8* src,s32 src_len,u8* dest);
 
 

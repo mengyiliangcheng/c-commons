@@ -213,6 +213,40 @@ s32 strings_compare_s(const s8* str1,const s8* str2,s32 len)
     return *str1 - *str2;
 }
 
+void strings_move(s8* dest,s8* src,s32 len)
+{
+    if(NULL == dest || NULL == src || len < 0)
+    {
+        Assert(dest);
+        Assert(src);
+        Assert(len >= 0);
+        return;
+    }
+
+    while(len > 0)
+    {
+        *dest++ = *src++;
+        len --;
+    }
+}
+
+s32 strings_insert(s8* str1,s32 pos,s8* str2)
+{
+    if(NULL == str1 || NULL == str2 || pos < 0)
+    {
+        Assert(str1);
+        Assert(str2);
+        Assert(pos >= 0);
+        return -4;
+    }
+
+    while(pos > 0)
+    {
+        str1++;
+        pos--;
+    }
+}
+
 
 void strings_replace_first(s8* str1,s8* str2,s8* str3)  
 {
@@ -363,6 +397,36 @@ void strings_trim(char *str)
 {
     strings_ltrim(str);
     strings_rtrim(str);
+}
+
+
+ST_UTILS_STRINGS* strings_new()
+{
+    ST_UTILS_STRINGS* str = commons_malloc(sizeof(ST_UTILS_STRINGS));
+
+    str->str = (s8*)commons_malloc(UTILS_STRINGS_MAX_LEN);
+    if(!str->str)
+    {
+        commons_free(str);
+        return NULL;
+    }
+
+    return str;
+}
+
+void strings_delete(ST_UTILS_STRINGS* str)
+{
+    if(!str)
+    {
+        return ;
+    }
+
+    if(NULL != str->str)
+    {
+        commons_free(str->str);
+        str->str = NULL;
+    }
+    commons_free(str);
 }
 
 

@@ -12,7 +12,7 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include "utils_file.h"
- 
+ #include "digest.h"
  
 /**
 *description:check file exist or not
@@ -36,14 +36,16 @@ BOOL file_exist(s8* file_path)
 
 s32 file_write(s8* file_path,s8* in,s32 len)
 {
-    if(NULL == file_path || NULL == in){
+    if(NULL == file_path || NULL == in)
+    {
         return -4;
     }
     FILE* fp = NULL;
     s32 ret;
 
     fp = fopen(file_path,"wb");
-    if(NULL == fp){
+    if(NULL == fp)
+    {
         return -1;
     }
 
@@ -78,8 +80,62 @@ s32 file_read(s8* file_path,s8* out,s32 len)
     return ret;
 }
 
+s32 file_copy(s8* src_path,s8* dest_path)
+{
+    s32 ret = 0;
+    s32 len;
+    s8 buffer[1024];
+    FILE* fp_src = NULL;
+    FILE* fp_dest = NULL;
 
-s32 utils_file_size(s8* file_path)
+    if(!src_path || !dest_path)
+    {
+        return -1;
+    }
+
+    fp_src = fopen(src_path,"rb");
+    if(NULL == fp_src)
+    {
+        commons_println("open src error");
+        return -1;
+    }
+
+    fp_dest = fopen(dest_path,"wb");
+    if(NULL == fp_dest)
+    {
+        commons_println("open dest error");
+        fclose(fp_src);
+        return -1;
+    }
+
+    BZERO(buffer,sizeof(buffer));
+    while((len = fread(buffer,1,sizeof(buffer),fp_src)) > 0)
+    {
+        ret = fwrite(buffer,1,len,fp_dest);
+        if(ret != len)
+        {
+            fclose(fp_src);
+            fclose(fp_dest);
+            return -1;
+        }
+    }
+
+    fclose(fp_src);
+    fclose(fp_dest);
+    
+    return 0;
+}
+
+void file_remove(s8* file_path)
+{
+    if(file_exist(file_path))
+    {
+        unlink(file_path);
+        sync();
+    }
+}
+
+s32 file_size(s8* file_path)
 {
     if(NULL == file_path)
     {
@@ -97,6 +153,33 @@ s32 utils_file_size(s8* file_path)
     ret = ftell(fp);
 
     return ret;
+}
+
+s32 file_save_overlap(s8* file_path,s8* in,s32 len)
+{
+    s32 ret;
+    s8 buffer[256] = {0};
+    
+    ret = file_write(file_path,in,len);
+    if(ret <= 0)
+    {
+       return ret;
+    }
+    if(strlen(file_path) > sizeof(buffer))
+    {
+        return -2;
+    }
+    
+    sprintf(buffer,"%s%s",file_path,".bak");
+    file_remove(buffer);
+    ret = file_write(buffer,in,len);
+
+    return ret;
+}
+
+s32 file_read_overlap(s8* file_path,s8* out,s32 len)
+{
+    file_read(file_path,out,len);    
 }
 
 

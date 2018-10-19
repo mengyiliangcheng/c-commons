@@ -28,7 +28,8 @@ export HEAD_DIR = -I./mempool \
            -I./file \
            -I./json \
            -I./test \
-           -I./time
+           -I./time \
+           -I./algorithm
 
 SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
           $(CUR_PWD)/mempool/mempool.c \
@@ -37,7 +38,8 @@ SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
           $(CUR_PWD)/log/commons_log.c \
           $(CUR_PWD)/file/utils_file.c \
           $(CUR_PWD)/json/cJSON.c \
-          $(CUR_PWD)/time/utils_time.c 
+          $(CUR_PWD)/time/utils_time.c \
+          $(CUR_PWD)/algorithm/digest.c
 
 #OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)

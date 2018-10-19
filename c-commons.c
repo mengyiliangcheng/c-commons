@@ -76,6 +76,30 @@ int testCommonsRandStr()
     commons_rand_str(tmp,len);
     commons_println(tmp);
 }
+
+int testFileSaveOverlap()
+{
+    char path[] = "./tmp.txt";
+    char buf[] = "helloworld";
+    s32 ret;
+    ret = file_save_overlap(path,buf,strlen(buf));
+    COMMONS_MAIN_LOG("save file:%d",ret);
+}
+
+int testCrc8()
+{
+    char buf[] = {1,2,3};
+    u8 crc;
+    crc = utils_cal_crc_8(buf,sizeof(buf));
+    COMMONS_MAIN_LOG("crc:%d",crc);
+}
+
+int testFileCopy()
+{
+    file_copy("./c-commons.elf","./hello.txt");
+}
+
+
 int testOthers()
 {
     
@@ -86,6 +110,9 @@ ST_TEST_LIST TabTestList[] =
     {"test mempool",               testMempool },
     {"test commons_scanf",         testCommonsScanf},
     {"test commons_rand_str",      testCommonsRandStr},
+    {"test file_save_overlap",     testFileSaveOverlap},
+    {"test utils_cal_crc_8",       testCrc8},
+    {"test file_copy",             testFileCopy},
     {"test others",                testOthers}
     
 };
