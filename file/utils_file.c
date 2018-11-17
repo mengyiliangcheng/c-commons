@@ -9,10 +9,15 @@
  *
  */
  
- #include <stdio.h>
- #include <stdlib.h>
- #include "utils_file.h"
- #include "digest.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "utils_file.h"
+#include "digest.h"
+#include "zlib.h"
+#include "zip.h"
+
+#define LOG(...) COMMONS_LOG("UTILS_FILE",__VA_ARGS__);
+
  
 /**
 *description:check file exist or not
@@ -181,6 +186,195 @@ s32 file_read_overlap(s8* file_path,s8* out,s32 len)
 {
     file_read(file_path,out,len);    
 }
+
+
+
+s32 file_package1()
+{
+    char text[] = "zlib compress and uncompress test\nturingo@163.com\n2012-11-05\n";
+	u64 tlen = strlen(text) + 1;
+	char* buf = NULL;
+	u64 blen;
+    s32 ret;
+ 
+	/* 计算缓冲区大小，并为其分配内存 */
+	blen = compressBound(tlen);	/* 压缩后的长度是不会超过blen的 */
+    printf("blen:%d\n",blen);
+	if((buf = (char*)malloc(sizeof(char) * blen)) == NULL)
+	{
+		commons_println("no enough memory!\n");
+		return -1;
+	}
+ 
+	/* 压缩 */
+    ret = compress(buf, &blen, text, tlen);
+	if(ret != Z_OK)
+	{
+		commons_println("compress failed!ret:%d\n",ret);
+		return -1;
+	}
+    commons_print_hex(buf,sizeof(buf));
+ 
+	/* 解压缩 */
+	if(uncompress(text, &tlen, buf, blen) != Z_OK)
+	{
+		commons_println("uncompress failed!\n");
+		return -1;
+	}
+ 
+	/* 打印结果，并释放内存 */
+	printf("%s", text);
+	if(buf != NULL)
+	{
+		free(buf);
+		buf = NULL;
+	}
+ 
+    return 0;
+}
+
+s32 file_compress(s8* src_file,s8* dest_file)
+{
+    FILE* file;
+    u64 flen;
+    u8* fbuf = NULL;
+    u64 clen;
+    u8* cbuf = NULL;
+    
+    if((file = fopen(src_file, "rb")) == NULL)
+    {
+        commons_println("Can\'t open %s!\n", src_file);
+        return -1;
+    }
+    fseek(file, 0L, SEEK_END);
+    flen = ftell(file);
+    fseek(file, 0L, SEEK_SET);
+    if((fbuf = (unsigned char*)malloc(sizeof(unsigned char) * flen)) == NULL)
+    {
+        commons_println("No enough memory!\n");
+        fclose(file);
+        return -1;
+    }
+    fread(fbuf, sizeof(unsigned char), flen, file); 
+    /* 压缩数据 */
+    clen = compressBound(flen);
+    if((cbuf = (unsigned char*)malloc(sizeof(unsigned char) * clen)) == NULL)
+    {
+        printf("No enough memory!\n");
+        fclose(file);
+        return -1;
+    }
+    if(compress(cbuf, &clen, fbuf, flen) != Z_OK)
+    {
+        printf("Compress %s failed!\n",src_file);
+        return -1;
+    }
+
+    fclose(file);
+
+    if((file = fopen(dest_file, "wb")) == NULL)
+    {
+        printf("Can\'t create %s!\n",dest_file);
+        return -1;
+    }
+    fwrite(&flen, sizeof(u64), 1, file);
+    fwrite(&clen, sizeof(u64), 1, file);
+    fwrite(cbuf, sizeof(u8), clen, file);
+    fclose(file);
+ 
+    free(fbuf);
+    free(cbuf);
+ 
+    return 0;
+
+}
+
+s32 file_check_duplicate_name(s8* old_filename,s8* new_filename,u32 dept)
+{
+    s8 package_name[UTILS_FILE_MAX_NAME_LEN + 16] = {0};
+
+    if(NULL == old_filename || NULL == new_filename)
+    {
+        return -1;
+    }
+    
+    if(file_exist(old_filename))
+    {
+        BZERO(package_name,sizeof(package_name));
+        sprintf(package_name,"%s-%d",old_filename,dept);
+        file_check_duplicate_name(package_name,new_filename,dept+1);
+    }else
+    {
+        strncpy(new_filename,old_filename,strlen(old_filename));
+        return 0;
+    }
+}
+
+s32 file_del_suffix_name(s8* file_name)
+{
+    s32 i = 0;
+    BOOL dot_found = FALSE;
+    if(NULL == file_name) return -1;
+    for(;i < strlen(file_name);i ++)
+    {
+        if('.' == file_name[i])
+        {
+            file_name[i] = 0;
+            break;
+        }
+    }
+    return 0;
+}
+
+s32 file_add_suffix_name(s8* file_name)
+{
+    s32 i = 0;
+    BOOL dot_found = FALSE;
+    if(NULL == file_name) return -1;
+    for(;i < strlen(file_name);i ++)
+    {
+        if('.' == file_name[i])
+            dot_found = TRUE;
+
+        if(!dot_found)
+            strcat(file_name,".zip");
+    }
+    return 0;
+}
+
+s32 file_package(s8* fileNameInZip,s8* packageName)
+{
+#if 0
+    zipFile zf;
+    zip_fileinfo file_info;
+    s32 ret;
+    s8 package_name[UTILS_FILE_MAX_NAME_LEN + 16] = {0};
+    s8 dest_file[UTILS_FILE_MAX_NAME_LEN + 16] = {0};
+
+    if(NULL == fileNameInZip || NULL == dest_file)
+    {
+        return -1;
+    }
+
+    BZERO(dest_file,sizeof(dest_file));
+    strings_copy(dest_file,packageName,MIN(sizeof(dest_file),strlen(packageName)));
+    
+    file_del_suffix_name(dest_file);
+    file_check_duplicate_name(dest_file,package_name,0);
+    file_add_suffix_name(package_name);
+    LOG("package name:%s",package_name);  
+    
+    zf = zipOpen(dest_file, APPEND_STATUS_CREATE);
+    if(NULL == zf)
+    {
+        LOG("zip open failed");
+    }
+
+    BZERO(&file_info,sizeof(file_info));
+    filetime(fileNameInZip,&file_info.tmz_date,&file_info.dosDate);
+   #endif 
+}
+
 
 
  

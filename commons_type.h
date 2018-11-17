@@ -11,6 +11,11 @@
 #ifndef __COMMONS_TYPE_H__
 #define __COMMONS_TYPE_H__
 
+
+typedef unsigned long u64;
+
+typedef long s64;
+
 typedef int s32;
 
 typedef unsigned int u32;

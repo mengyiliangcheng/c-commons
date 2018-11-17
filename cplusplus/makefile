@@ -7,13 +7,13 @@
 #***************************************************/ 
 
 CFLAGS += -g
-CFLAGS := -I$(shell pwd) 
+CFLAGS := -I$(shell pwd) -I../includes/ 
 CFLAGS += -O2
 CFLAGS += -std=c++11
 CC = g++
-TARGET=learn
+TARGET=testlibz
 
-DYNAMIC_LIBS = 
+DYNAMIC_LIBS = -L../libs -lz
 
 CUR_PWD=$(shell pwd)
 
@@ -24,11 +24,11 @@ SRC_DIR =
 OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)
 CFLAGS += $(HEAD_DIR)
-CFLAGS += $(DYNAMIC_LIBS)
+#CFLAGS += $(DYNAMIC_LIBS)
 
 OBJ += $(SRC_DIR:%.c=%.o)
 $(TARGET):$(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET)
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(DYNAMIC_LIBS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $< -o $@

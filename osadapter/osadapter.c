@@ -66,6 +66,24 @@ s32 commons_print_hex(const void* src,s32 src_len)
     return 0;
 }
 
+s32 commons_print_hex_no_space(const void* src,s32 src_len)
+{
+    s32 i;
+    u8* ptr = NULL;
+    if(NULL == src || src_len <= 0){
+        return -1;
+    }
+    
+    ptr = (u8*)src;
+    for(i = 0;i < src_len;i ++)
+    {
+        commons_print("%02X",ptr[i]);
+    }
+    commons_println("");
+    return 0;
+}
+
+
 
 void commons_flush(FILE *fp)
 {
@@ -172,6 +190,11 @@ void commons_memset(void* dest,s32 ch,s32 count)
         return ;
     }
     memset(dest,ch,count);
+}
+
+void commons_bzero(void* dest,s32 count)
+{
+    commons_memset(dest,0,count);
 }
 
 s32 commons_rand()
