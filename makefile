@@ -40,6 +40,7 @@ export HEAD_DIR = -I./mempool \
            -I./openssl/include
 
 SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
+          $(CUR_PWD)/example/test.c \
           $(CUR_PWD)/mempool/mempool.c \
           $(CUR_PWD)/osadapter/osadapter.c \
           $(CUR_PWD)/string/utils_string.c \
