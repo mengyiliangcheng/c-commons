@@ -11,7 +11,14 @@
 #ifndef __COMMONS_TEST_H__
 #define __COMMONS_TEST_H__
 
+typedef struct
+{
+    char dispName[64];
+    int (*fun)(void);
+}ST_TEST_LIST;
 
+
+extern void testProgramUI(void);
 extern int testStringToHex();
 extern int testCommonsScanf();
 extern int testMempool();
@@ -21,6 +28,8 @@ extern int testCrc8();
 extern int testFileCopy();
 extern int testReadXMl();
 extern int testFilePackage();
+extern int testCbcEncrypt();
+extern int testOthers();
 
 #endif
 

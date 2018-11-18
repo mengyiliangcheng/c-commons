@@ -10,6 +10,7 @@
 */
 #include "optimal.h"
 
+#if 0
 s32  index_kmp(s8* src_str,s8* match_str,s32 pos)
 {
     s32 i;
@@ -36,5 +37,5 @@ s32  index_kmp(s8* src_str,s8* match_str,s32 pos)
     }
     
 }
-
+#endif
 

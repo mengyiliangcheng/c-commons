@@ -10,7 +10,8 @@
  * limitations under the License.
  *
 */
-
+extern int utils_cbc_encrypt(void *in, size_t inLen, char *key, void *out);
+extern int utils_cbc_decrypt(void *in, size_t inLen, char *key, void *out);
 
 #endif
 

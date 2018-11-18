@@ -16,8 +16,8 @@ else
 endif
 
 DYNAMIC_LIBS_DIR = -L./xml/lib -L./libs -L./openssl/lib
-DYNAMIC_LIBS = -lsdkxml -lsdkz -lssl -lcrypto
-STATIC_LIBS = 
+DYNAMIC_LIBS = -lsdkxml -lsdkz #-lcrypto -lssl
+STATIC_LIBS = ./openssl/lib/libcrypto.a ./openssl/lib/libssl.a
 
 CUR_PWD=$(shell pwd)
 
@@ -38,19 +38,12 @@ export HEAD_DIR = -I./mempool \
            -I./includes \
            -I./zlib/contrib/minizip \
            -I./openssl/include
-
-SRC_DIR = $(CUR_PWD)/example/mempool_example.c \
-          $(CUR_PWD)/example/test.c \
-          $(CUR_PWD)/mempool/mempool.c \
-          $(CUR_PWD)/osadapter/osadapter.c \
-          $(CUR_PWD)/string/utils_string.c \
-          $(CUR_PWD)/log/commons_log.c \
-          $(CUR_PWD)/file/utils_file.c \
-          $(CUR_PWD)/json/cJSON.c \
-          $(CUR_PWD)/time/utils_time.c \
-          $(CUR_PWD)/algorithm/digest.c \
-          $(CUR_PWD)/thread/utils_thread.c \
-          $(CUR_PWD)/xml/src/utils_xml.c
+           
+           
+#SOURCES = $(wildcard *.c)
+SOURCES = $(wildcard */*.c)
+SOURCES += $(wildcard */src/*.c)
+SRC_DIR = $(SOURCES)
 
 #OBJ = $(TARGET).o
 #OBJ += $(INC:%.h=%.o)
@@ -61,7 +54,7 @@ CFLAGS += $(HEAD_DIR)
 
 OBJ += $(SRC_DIR:%.c=%.o)
 $(TARGET):$(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(DYNAMIC_LIBS_DIR) $(DYNAMIC_LIBS) 
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(DYNAMIC_LIBS_DIR) $(DYNAMIC_LIBS) $(STATIC_LIBS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -69,6 +62,7 @@ $(TARGET):$(OBJ)
 .PHONY:clean
 clean:
 	rm -f *.o *.out *.elf ./*/*.o ./*/*.swo* ./*/*.swp*
+	rm -rf $(OBJ)
 
 
 
