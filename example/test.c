@@ -20,6 +20,7 @@
 
 ST_TEST_LIST TabTestList[] =
 {
+#if 1
     {"test strings_to_hex",        testStringToHex},
     {"test mempool",               testMempool },
     {"test commons_scanf",         testCommonsScanf},
@@ -30,8 +31,15 @@ ST_TEST_LIST TabTestList[] =
     {"test package",               testFilePackage},
     {"test read xml",              testReadXMl},
     {"test others",                testOthers},
-    {"testCbcEncrypt",						 testCbcEncrypt},
-
+    {"testCbcEncrypt",             testCbcEncrypt},
+    {"testAnalyzeLog",             testAnalyzeLog},
+    {"testConvertTime",            testConvertTime},
+    {"testThreadCond",             testThreadCond},
+    {"testCreateServer",           testCreateServer},
+    {"testCreateClient",           testCreateClient},
+    
+#endif
+    //{"testAnalyzeLog",             testAnalyzeLog},
 };
 
 #define TEST_TABLE_SIZE (sizeof(TabTestList) / sizeof(ST_TEST_LIST))
@@ -215,11 +223,60 @@ int testCbcEncrypt()
     commons_print_hex_no_space(org_data,sizeof(org_data));
 }
 
+int testAnalyzeLog()
+{
+    analyze_log("Nov 20 05:50:30","Nov 21 12:21:58",FALSE);
+}
+
+int testConvertTime()
+{
+    utils_time_convert();
+}
+
+int testThreadCond()
+{
+    utils_thread_cond();
+}
+
+#include<signal.h>
+int testSignal()
+{
+    pid_t pid;
+    pid = getPidByName("testThread.elf");
+    LOG("pid:%d",pid);
+    kill(pid,SIGRTMIN+10);
+}
+
+int testCreateThread()
+{
+    utils_thread_create_process("./thread/test/testThread.elf");
+    sleep(3);
+    testSignal();
+}
+
+int testCreateServer()
+{
+    utils_thread_create_process("./network/test/testServer.elf");
+}
+
+int testCreateClient()
+{
+    utils_network_create_client();
+}
 
 int testOthers()
 {
- 
+
+    time_t ts,time_offset;
+    int rc;
+    
+    commons_println("genoff update time hander");
+
+    time(&ts);
+    commons_println("Daemon:%s: time:%lld\n",
+                __func__,ts);
 }
+
 
 
 

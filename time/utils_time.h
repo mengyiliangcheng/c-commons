@@ -16,6 +16,10 @@
 /****************************macro**********************************************/
  
 /****************************function*******************************************/
-
+extern u32 utils_print_time(struct tm* tm_time);
+extern u32 utils_strptime(s8* buf,s8* fmt,struct tm* tm_time);
+extern time_t utils_strptime_compare(s8* src1,s8* src2,s8* fmt);
+extern int utils_time_convert();
+extern char* utils_time_get_timestamp(void);
 #endif
 

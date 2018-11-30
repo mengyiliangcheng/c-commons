@@ -20,6 +20,9 @@
 #undef MIN
 #define MIN(a,b) (a < b ? a : b)
 
+#undef MAX
+#define MAX(a, b) (a > b ? a : b)
+
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
 
 #define COMMONS_OS_LOG(...) COMMONS_LOG("osadapter",__VA_ARGS__);

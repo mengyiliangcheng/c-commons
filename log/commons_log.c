@@ -14,10 +14,24 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <limits.h>
+#include <time.h>
 #include "commons_log.h"
 
 #define COMMONS_LOG_FILE  "./log/commons.log" 
 
+
+char* utils_time_get_timestamp(void)
+{
+    time_t time_tmp;
+    struct tm* timep;
+    static char time_stream[64] = {0};
+
+    time(&time_tmp);
+    timep = gmtime(&time_tmp);
+    strftime(time_stream,100,"%h %e %T ",timep);
+    return time_stream;
+}
 
 u8* commons_get_shortname(u8* path)
 {
@@ -41,13 +55,13 @@ u8* commons_get_shortname(u8* path)
 }
 
 
-s32 commons_log(const u8* module,const u8* format, ...)
+s32 commons_log(const u8* format, ...)
 {
     va_list ap;
-    s32 ret;    
+    s32 ret;
     //static FILE *fp = NULL;
 
-    printf("[%s] ",module);
+    //printf("[%s] ",module);
     va_start(ap, format);
     
     ret = vprintf(format, ap);
@@ -62,7 +76,6 @@ s32 commons_log(const u8* module,const u8* format, ...)
 
     return ret;
 }
-
 
 
 

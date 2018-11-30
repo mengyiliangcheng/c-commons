@@ -11,6 +11,78 @@
 
 #include "commons_type.h"
 #include "utils_time.h"
+#include "osadapter.h"
+#include <stdlib.h>
+
+u32 utils_print_time(struct tm* tm_time)
+{
+    commons_println("tm_year:%d",tm_time->tm_year);
+    commons_println("tm_mon :%d",tm_time->tm_mon);
+    commons_println("tm_wday:%d",tm_time->tm_wday);
+    commons_println("tm_hour:%d",tm_time->tm_hour);
+    commons_println("tm_min :%d",tm_time->tm_min);
+    commons_println("tm_sec :%d",tm_time->tm_sec);
+    return 0;
+}
+
+u32 utils_strptime(s8* buf,s8* fmt,struct tm* tm_time)
+{
+    if(NULL == buf||NULL == fmt||NULL == tm_time)
+        return -1;
+    strptime(buf,fmt,tm_time);
+    if(tm_time->tm_year < 100 || tm_time > 200)
+    {
+        tm_time->tm_year = 112;
+        tm_time->tm_mon = 8;
+    }
+    return 0;
+}
+
+/* src1 - src2*/
+time_t utils_strptime_compare(s8* src1,s8* src2,s8* fmt)
+{
+    struct tm tm_time1;
+    struct tm tm_time2;
+    time_t time_tmp1;
+    time_t time_tmp2;
+    utils_strptime(src1,fmt,&tm_time1);
+    utils_strptime(src2,fmt,&tm_time2);
+
+    time_tmp1 = mktime(&tm_time1);
+    time_tmp2 = mktime(&tm_time2);
+
+    return time_tmp1 - time_tmp2;
+}
+
+int utils_time_convert()
+{
+    time_t time_tmp;
+    struct tm* timep;
+    time_tmp = 1542433551006;
+    char tmp[128] = {0};
+    char time_stream[128] = {0};
+
+    time(&time_tmp);
+    commons_println("current time:%lld",time_tmp);
+
+    timep = gmtime(&time_tmp);
+    strftime(tmp,100,"time is now:%h %e %T ",timep);
+    commons_println("%s",tmp);
+    commons_println("%lld",time_tmp-315964800);
+
+    commons_println("pls input your time:");
+    //commons_flush(stdin);
+    commons_scanf(time_stream,sizeof(time_stream),SCANF_NUMBER);
+    time_tmp = strtoul(time_stream,NULL,0);
+    commons_println("%lld",time_tmp);
+
+    
+    timep = gmtime(&time_tmp);
+    strftime(tmp,100,"your time is:%Y-%m-%d %H:%M:%S",timep);
+    commons_println("%s",tmp);
+}
+
+
 
 u32 utils_get_utc_time(void)
 {

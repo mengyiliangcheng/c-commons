@@ -7,14 +7,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef __UTILS_THREAD_H__
-#define __UTILS_THREAD_H__
+ */
+#ifndef __COMMONS_TYPE_H__
+#define __COMMONS_TYPE_H__
 
 
-extern u32 utils_thread_create_process(s8* file);
+typedef unsigned long u64;
+
+typedef long s64;
+
+typedef int s32;
+
+typedef unsigned int u32;
+
+typedef char s8;
+
+typedef unsigned char u8;
+
+typedef int BOOL;
+
+#undef TRUE
+#define TRUE 1
+
+#undef FALSE
+#define FALSE 0
+
+#undef NULL
+#define NULL (void*)0
 
 
-#endif 
- 
+#endif
 

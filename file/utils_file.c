@@ -140,7 +140,7 @@ void file_remove(s8* file_path)
     }
 }
 
-s32 file_size(s8* file_path)
+s32 utils_file_size(s8* file_path)
 {
     if(NULL == file_path)
     {
@@ -156,7 +156,7 @@ s32 file_size(s8* file_path)
     }
     fseek(fp,0L,SEEK_END);
     ret = ftell(fp);
-
+    fclose(fp);
     return ret;
 }
 
@@ -373,6 +373,146 @@ s32 file_package(s8* fileNameInZip,s8* packageName)
     BZERO(&file_info,sizeof(file_info));
     filetime(fileNameInZip,&file_info.tmz_date,&file_info.dosDate);
    #endif 
+}
+
+
+typedef struct
+{
+    char reason[128];
+    char descript[256];
+    /* 1-使用上次状态 2-输出后面一个字节*/
+    int record_type;
+    char last_descript[256];
+}ST_ANALYZE_LOG;
+
+ST_ANALYZE_LOG TAB_ANALYZE_LOG[] = 
+{
+    {"MCU powerkey wakeup event !!!"    ,"MCU powerkey wakeup event",1,"进入休眠"},
+    {"[gps] JSON"                       ,"定位成功"},
+    {"===========tracker service has start=============","应用启动",1,"进入psm"},
+    {"flp position wait timeout"        ,"定位失败"},
+    {"dev logout",                      "上报数据失败"},
+    {"start task,dev status:"           ,"开始上报"},
+    {"report succ,current total count"  ,"上报成功"},
+    {"HandleAppItem: sid:86, cid:2",    "mcu通知定位"},
+    {"timeout int 35 s!!!",             "hilink登录云模式超时"},
+    {"start report cache hander"        ,"触发上报"},
+    {"AT+CPSMS=1, Psm Open Status"      ,"sleep模块使能psm"},
+    {"AT+CPSMS=0, Psm Close Status."    ,"sleep模块关闭psm"},
+    {"MCU  wakeup event "               ,"休眠唤醒"},
+    {"Received SOS msg"                 ,"mcu触发sos"},
+    {"[Alarm] JSON:{\"code\":1"         ,"收到满电报警"},
+    {"[Alarm] JSON:{\"code\":6"         ,"收到出围栏告警"},
+    {"[Alarm] JSON:{\"code\":7"         ,"收到sos告警"},
+    {"The system will shutdown"         ,"mcu通知9206关机"},
+    {"psmEnable sig : 1"                ,"mcu通知可以进入psm"},
+    {"psmEnable sig : 0"                ,"mcu通知不可以进入psm"},
+    {"Current Dialup Status Changed to 1","拨号成功"},
+    {"report failed:no reg network",     "上报失败，没注网"},
+    {"Sntp Sync successed!!!!",          "nitz/sntp校时成功"},
+    {"Test  power_on_reason****"         ,"唤醒原因:",              2},
+};
+
+const char *const boot_reason_list[8] =
+{
+    [0] = ("reboot"),
+    [2] = ("TAU唤醒"),
+    [6] = ("MCU唤醒"),
+};
+
+
+void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time)
+{
+    FILE* fp = NULL;
+    FILE* analyze_res_fp = NULL;
+    fp = fopen("./tracker.log","r+");
+    char tmp[1024];
+    char s_date[128];
+    char buffer[1024];
+    char s_last_record[1024];
+    char s_last_date[128];
+    BOOL start_flag = FALSE;
+    time_t time_tmp;
+    int i = 0;
+    unlink("./result.csv");
+    analyze_res_fp = fopen("./result.csv","a+");
+
+    if(fp == NULL || analyze_res_fp == NULL)
+    {
+        commons_println("log file [./tracker.log] is not exist");
+        return;
+    }
+
+    while(!feof(fp))
+    {
+        bzero(tmp,sizeof(tmp));
+        fgets(tmp,sizeof(tmp),fp);
+
+        if(!start_flag && b_check_time)
+        {
+            bzero(s_date,sizeof(s_date));
+            memcpy(s_date,tmp,15);
+            if(utils_strptime_compare(start_time,s_date,"%h %e %T") > 0)
+            {
+                continue;
+            }
+            start_flag = TRUE;
+        }
+        
+        for(i = 0;i < sizeof(TAB_ANALYZE_LOG)/sizeof(ST_ANALYZE_LOG);i++)
+        {
+            if(strstr(tmp,TAB_ANALYZE_LOG[i].reason))
+            {
+                if(1 == TAB_ANALYZE_LOG[i].record_type)
+                {
+                    bzero(buffer,sizeof(buffer));
+                    bzero(s_date,sizeof(s_date));
+                    memcpy(s_date,s_last_record,15);
+
+                    time_tmp = utils_strptime_compare(s_date,s_last_date,"%h %e %T");
+                    //commons_println("%d",time_tmp);
+                    sprintf(buffer,"%s,%s,%d\n",s_date,TAB_ANALYZE_LOG[i].last_descript,time_tmp);
+                    fwrite(buffer,sizeof(char),strlen(buffer),analyze_res_fp);
+                }
+                bzero(buffer,sizeof(buffer));
+                bzero(s_date,sizeof(s_date));
+                memcpy(s_date,tmp,15);
+                if(2 == TAB_ANALYZE_LOG[i].record_type)
+                {
+                    char* pos = strstr(tmp,TAB_ANALYZE_LOG[i].reason);
+                    int boot_reason = atoi((pos+strlen(TAB_ANALYZE_LOG[i].reason)));
+                    //commons_println("boot reason:%d",boot_reason);
+                    sprintf(buffer,"%s,%s%s,\n",s_date,TAB_ANALYZE_LOG[i].descript,boot_reason_list[boot_reason]);
+                }else
+                {
+                    sprintf(buffer,"%s,%s,\n",s_date,TAB_ANALYZE_LOG[i].descript);
+                }
+                fwrite(buffer,sizeof(char),strlen(buffer),analyze_res_fp);
+
+                if(i == 0 || i == 2)
+                {
+                    strcpy(s_last_date,s_date);
+                }
+                break;
+            }
+            
+        }
+        bzero(s_last_record,sizeof(s_last_record));
+        strcpy(s_last_record,tmp);
+
+        if(b_check_time)
+        {
+            bzero(s_date,sizeof(s_date));
+            memcpy(s_date,tmp,15);
+            if(utils_strptime_compare(end_time,s_date,"%h %e %T") < 0)
+            {
+                break;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(analyze_res_fp);
+    commons_println("analyze log finish,output file:./result.csv");
 }
 
 

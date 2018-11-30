@@ -29,7 +29,12 @@ extern int testFileCopy();
 extern int testReadXMl();
 extern int testFilePackage();
 extern int testCbcEncrypt();
+extern int testAnalyzeLog();
 extern int testOthers();
+extern int testConvertTime();
+extern int testThreadCond();
+extern int testCreateServer();
+extern int testCreateClient();
 
 #endif
 

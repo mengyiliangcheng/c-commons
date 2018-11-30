@@ -18,6 +18,25 @@ pwd=$PWD
 
 ARG1=$1
 
+cd ./network/test
+make clean
+make
+RET=$?
+check_sub()
+{
+    if [ $1 -eq 0 ]
+    then
+        echo -e "\nMake success !\n"
+    else
+        echo -e "\nMake error!\n"
+        exit 1
+    fi
+    return 0
+}
+check_sub $RET
+
+cd $pwd
+
 clear
 echo "Clean ..."
 make clean
