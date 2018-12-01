@@ -13,5 +13,6 @@
 #define __UTILS_NETWORK_H__
 
 extern int utils_network_create_server(void);
+extern s32 utils_network_create_client(void);
 
 #endif

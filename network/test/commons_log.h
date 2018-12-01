@@ -20,7 +20,7 @@ extern u8* commons_get_shortname(u8* path);
        }while(0)
 
 #define COMMONS_LOG(module,format, ... ) do{ \
-        commons_log("%s %s:%s|%d::"format,utils_time_get_timestamp(),module,commons_get_shortname(__FILE__),__LINE__,##__VA_ARGS__); \
+        commons_log("%s %s:%s/%s|%d::"format,utils_time_get_timestamp(),module,commons_get_shortname(__FILE__),__func__,__LINE__,##__VA_ARGS__); \
        }while(0) 
 
 

@@ -37,8 +37,8 @@ export HEAD_DIR = -I./mempool \
            -I./thread \
            -I./includes \
            -I./zlib/contrib/minizip \
-           -I./openssl/include
-           
+           -I./openssl/include \
+           -I./network           
            
 #SOURCES = $(wildcard *.c)
 SOURCES = $(wildcard */*.c)

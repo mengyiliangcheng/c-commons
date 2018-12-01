@@ -14,6 +14,7 @@
 #include "utils_string.h"
 #include "osadapter.h"
 #include "utils_xml.h"
+#include "utils_network.h";
 #include "test.h"
 
 #define LOG(...) COMMONS_LOG("MAIN",__VA_ARGS__);
@@ -261,7 +262,8 @@ int testCreateServer()
 
 int testCreateClient()
 {
-    utils_network_create_client();
+    utils_thread_create_thread((void*)utils_network_create_client,NULL);
+    //utils_network_create_client();
 }
 
 int testOthers()

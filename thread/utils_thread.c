@@ -110,6 +110,18 @@ u32 utils_thread_create_process(s8* file)
     return 0;
 }
 
+pthread_t utils_thread_create_thread(void* (*func)(void *),void* args)
+{
+    pthread_t pth;
+    
+    if(pthread_create(&pth,NULL,func,args) < 0)
+    {
+       LOG("create thread failed,err:%d",strerror(errno));
+       return -1;
+    }
+    return pth;
+}
+
 pthread_mutex_t count_lock;
 pthread_cond_t count_nonzero;
 int count;

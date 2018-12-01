@@ -11,9 +11,10 @@
 #ifndef __UTILS_THREAD_H__
 #define __UTILS_THREAD_H__
 
+#include "pthread.h"
 
 extern u32 utils_thread_create_process(s8* file);
-
+extern pthread_t utils_thread_create_thread(void* (*func)(void *),void* args);
 
 #endif 
  
