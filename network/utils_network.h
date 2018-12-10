@@ -14,5 +14,6 @@
 
 extern int utils_network_create_server(void);
 extern s32 utils_network_create_client(void);
+extern int utils_network_create_socket_server(void);
 
 #endif

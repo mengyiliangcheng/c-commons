@@ -24,6 +24,9 @@
 #define MAX(a, b) (a > b ? a : b)
 
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
+
+#define COMMONS_OS_LOG(...) COMMONS_LOG("osadapter",__VA_ARGS__);
+#define LOG(...) COMMONS_LOG("osadapter",__VA_ARGS__);
 #define Assert(x) assert(x)
 
 typedef enum
@@ -46,10 +49,6 @@ extern s32 commons_println(const char* format, ...);
 extern s32 commons_print_hex(const void* src,int src_len);
 
 extern int commons_rand();
-extern s32 commons_scanf(s8* dest,s32 dest_len,s32 type);
-
-extern s32 commons_logger(const s8* format, ...);
-
 
 #endif
 

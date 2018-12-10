@@ -14,6 +14,7 @@
 #include <unistd.h> 
 #include <errno.h>
 #include <sys/types.h>
+
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,8 @@
 #include "commons_log.h"
 #define BUF_SIZE 1024
 
-#define LOG(...) COMMONS_LOG("THREAD",__VA_ARGS__);
+//#define LOG(...) COMMONS_LOG("THREAD",__VA_ARGS__);
+#define LOG commons_logger
 
 void getNameByPid(pid_t pid, char *task_name) {
     char proc_pid_path[BUF_SIZE];
@@ -94,6 +96,7 @@ u32 utils_thread_create_process(s8* file)
 {
     pid_t pid;
 
+    LOG("create new process");
     pid = fork();
     if(pid == 0)
     {
@@ -119,6 +122,7 @@ pthread_t utils_thread_create_thread(void* (*func)(void *),void* args)
        LOG("create thread failed,err:%d",strerror(errno));
        return -1;
     }
+    LOG("create thread succ");
     return pth;
 }
 
@@ -186,8 +190,5 @@ u32 utils_thread_cond(void)
     pthread_exit(0);
     
 }
-
-
-
 
 

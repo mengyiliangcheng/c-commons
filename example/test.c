@@ -17,7 +17,11 @@
 #include "utils_network.h";
 #include "test.h"
 
+#ifdef USE_PRINTLN
+#define LOG commons_println
+#else
 #define LOG(...) COMMONS_LOG("MAIN",__VA_ARGS__);
+#endif
 
 ST_TEST_LIST TabTestList[] =
 {
@@ -50,7 +54,7 @@ void testProgramUI(void)
     int i = 0;
     commons_println("************c-commons test function*****************");
     for(i = 0;i < TEST_TABLE_SIZE;i ++){
-        commons_println("*%d:%s",i+1,TabTestList[i].dispName);
+        commons_println("*%02d:%s",i+1,TabTestList[i].dispName);
     }
     commons_println("****************************************************");
     return;
@@ -70,23 +74,34 @@ int testProgramProcess(void)
         if(0 == strlen(buffer))
         {
             commons_println("input error!!!");
+            goto CONTINUE;
             continue;
         }
         num = atoi(buffer);
+        if(99 == num)
+        {
+            return 0;
+        }
         if(num <= 0 || num > TEST_TABLE_SIZE)
         {
             commons_println("input error!!!");
+            goto CONTINUE;
             continue;
         }
         if(NULL == TabTestList[num - 1].fun)
         {
             commons_println("no function");
+            goto CONTINUE;
             continue;
         }
         TabTestList[num - 1].fun();
+        goto CONTINUE;
+
+CONTINUE:
         commons_println("please select item:");
 
     }
+    return 0;
 }
 
 
@@ -262,8 +277,15 @@ int testCreateServer()
 
 int testCreateClient()
 {
+    int semid;
+    semid = utils_thread_init_sem();
+    if(semid < 0)
+    {
+        return -1;
+    }
     utils_thread_create_thread((void*)utils_network_create_client,NULL);
-    //utils_network_create_client();
+
+    utils_thread_p(semid,0);
 }
 
 int testOthers()

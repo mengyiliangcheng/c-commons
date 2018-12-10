@@ -13,16 +13,19 @@
 
 #include "commons_type.h"
 
+//#define LOG_USE_PRINTLN
+
 extern u8* commons_get_shortname(u8* path);
 
 #define COMMONS_LOG1(module,format, ... ) do{ \
         commons_log(module,"%s|%d::"format,commons_get_shortname(__FILE__),__LINE__,##__VA_ARGS__); \
        }while(0)
-
+       
+#ifndef LOG_USE_PRINTLN
 #define COMMONS_LOG(module,format, ... ) do{ \
         commons_log("%s %s:%s/%s|%d::"format,utils_time_get_timestamp(),module,commons_get_shortname(__FILE__),__func__,__LINE__,##__VA_ARGS__); \
        }while(0) 
-
+#endif
 
 extern void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time);
 #endif

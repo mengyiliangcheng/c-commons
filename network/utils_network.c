@@ -18,13 +18,39 @@
 #include <sys/syscall.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
-
 #include "commons_log.h"
+#include "osadapter.h"
+#include "utils_sem.h"
+#include <time.h>
 
+#ifdef LOG
+#undef LOG
+#endif
+
+#define LOG_USE_PRINTLN
+#ifdef LOG_USE_PRINTLN
+#define LOG commons_logger
+#else
 #define LOG(...) COMMONS_LOG("NETWORK",__VA_ARGS__);
+#endif
+
+
 #define UNIX_DOMAIN "/tmp/unix_socket"
 #define MAX_CONNECTION_NUMBER 10
 #define MAX_SELECT_SOCKET 10
+
+static char* get_timestamp(void)
+{
+    time_t time_tmp;
+    struct tm* timep;
+    static char time_stream[64] = {0};
+
+    time(&time_tmp);
+    timep = gmtime(&time_tmp);
+    strftime(time_stream,100,"%h %e %T ",timep);
+    return time_stream;
+}
+
 
 int utils_network_create_server()
 {
@@ -44,6 +70,7 @@ int utils_network_create_server()
         LOG("can not create socket,err:%s",strerror(errno));
         return -1;
     }
+    LOG("server socket:%d",server_socket);
 
     //allow reuse
     if((setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse, sizeof(reuse))) < 0)
@@ -57,7 +84,7 @@ int utils_network_create_server()
     ret = unlink(UNIX_DOMAIN);
     if(ret < 0)
     {
-        LOG("delete file error,err:%s",strerror(errno));
+        //LOG("delete file error,err:%s",strerror(errno));
     }
 
     bzero(&server_addr,sizeof(server_addr));
@@ -81,17 +108,19 @@ int utils_network_create_server()
         return -1;
     }
 
-    //add server socket to set
-    FD_ZERO(&fset);
-    FD_SET(server_socket,&fset);
-
     while(1)
     {
         int fd;
         char recv_data[1024];
         int read_len;
-        fset_bak = fset;   //back up set,select would change the set
-        ret = select(MAX_SELECT_SOCKET+1,&fset,&fset,&fset,NULL);
+        int server_addr_len;
+        //fset_bak = fset;   //back up set,select would change the set
+
+        //add server socket to set
+        FD_ZERO(&fset);
+        FD_SET(server_socket,&fset);
+        LOG("start services...");
+        ret = select(MAX_SELECT_SOCKET+1,&fset,NULL,NULL,NULL);
         if(0 == ret)
         {
             LOG("select timeout,err:%s",strerror(errno));
@@ -101,21 +130,46 @@ int utils_network_create_server()
             LOG("select timeout,err:%s",strerror(errno));
             continue;
         }
+        LOG("detect request...");
 
         for(fd = 0;fd < MAX_SELECT_SOCKET;fd ++)
         {
-            if(FD_ISSET(fd,&fset_bak))
+            if(FD_ISSET(fd,&fset))
             {
+                LOG("request fd:%d,server fd:%d",fd,server_socket);
                 //connection request
                 if(fd == server_socket)
                 {
-                    client_socket = accept(server_socket,(struct sockaddr*)&server_addr,sizeof(struct sockaddr));
+                    server_addr_len = sizeof(server_addr);
+                    client_socket = accept(server_socket,(struct sockaddr*)&server_addr,&server_addr_len);
                     if(client_socket < 0)
                     {
-                        LOG("cannot accept client connect request,err:%s",strerror(errno));
+                        LOG("cannot accept client connect request,ret:%d,err:%s",client_socket,strerror(errno));
                         continue;
                     }
                     LOG("add client fd:%d",client_socket);
+
+                    char buf[1024];
+                    char send_buf[1024];
+                    //read and printf sent client info
+                    bzero(buf,sizeof(buf));
+                    ret = read(client_socket,buf,sizeof(buf));
+                    if(ret < 0)
+                    {
+                       LOG("cannot read client message,err:%s",strerror(errno));
+                       continue;
+                    }
+                    LOG("Message from client (%d)) :%s",ret,buf);
+                    //sleep(20);
+
+                    bzero(send_buf,sizeof(send_buf));
+                    sprintf(send_buf,"%s::%s",get_timestamp(),buf);
+                    LOG("Write Message To client  :%s",send_buf);
+                    ret = write(client_socket,send_buf,sizeof(send_buf));
+                    if(ret < 0)
+                    {
+                        LOG("cannot write message to client,err:%s",strerror(errno));
+                    }
                 }
                 //client data request
                 else
@@ -228,9 +282,77 @@ int utils_network_create_socket_server(void)
     return 0;
 }
 
+s32 utils_network_create_client()
+{
+    int connect_fd;
+    int ret;
+    char buf[256];
+    int semid;
+    struct sockaddr_un svr_addr;
 
+    //LOG("current pid:%d",getpid());
+    LOG("thread_one:int %d main process, the tid=%lu,pid=%ld\n",getpid(),pthread_self(),syscall(SYS_gettid));
 
-s32 utils_network_create_client(void)
+    connect_fd = socket(PF_UNIX,SOCK_STREAM,0);
+    if(connect_fd < 0)
+    {
+        LOG("create socket failed,err:%d",strerror(errno));
+        return -1;
+    }
+
+    /* connect to server*/
+    svr_addr.sun_family = AF_UNIX;
+    strcpy(svr_addr.sun_path,UNIX_DOMAIN);
+
+    ret = connect(connect_fd,(struct sockaddr*)&svr_addr,sizeof(svr_addr));
+    if(-1 == ret)
+    {
+        LOG("connect to server failed,err:%d",strerror(errno));
+        close(connect_fd);
+        return -1;
+    }
+
+    while(1)
+    {
+        bzero(buf,sizeof(buf));
+        commons_scanf(buf,sizeof(buf),SCANF_STRING);
+        LOG("send messages:%d,%s",SCANF_STRING,buf);
+        if(strstr(buf,"exit") > 0)
+        {
+            break;
+        }
+        ret = write(connect_fd,buf,sizeof(buf));
+        if(ret < 0)
+        {
+            LOG("write to server failed,err:%d",strerror(errno));
+            close(connect_fd);
+            return -1;
+        }
+
+        bzero(buf,sizeof(buf));
+        ret = read(connect_fd,buf,sizeof(buf));
+        if(ret < 0)
+        {
+            LOG("read from server failed,err:%d",strerror(errno));
+            close(connect_fd);
+            return -1;
+        }
+        LOG("read from server:[%s]",buf);
+    }
+    close(connect_fd);
+
+    semid = utils_thread_get_sem();
+    if(semid < 0)
+    {
+        return -1;
+    }
+
+    utils_thread_v(semid,0);
+
+    return 0;
+}
+
+s32 utils_network_create_socket_client(void)
 {
     int connect_fd;
     int ret;
