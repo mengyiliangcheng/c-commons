@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include <stdarg.h>
 #include <assert.h>
 #include "osadapter.h"
 #include "utils_string.h"
@@ -431,8 +432,6 @@ void strings_delete(ST_UTILS_STRINGS* str)
 
 #ifdef UTILS_STRINGS_API_2
 
-
-
 static inline size_t str_hdr_size(void)
 {
     return sizeof(ST_STR_HDR);
@@ -556,6 +555,52 @@ STRING str_cat(STRING s,const void * t)
 {
     str_catlen(s,t,strlen(t));
 }
+
+STRING str_cat_str(STRING s,const STRING t)
+{
+    return str_catlen(s,t,STR_LEN(t));
+}
+
+STRING str_cpylen(STRING s,const char* t,size_t len)
+{
+    if(STR_ALLOC_SIZE(s) < len)
+    {
+        s = str_make_room_for(s,len-STR_LEN(s));
+        if(!s) return NULL;
+    }
+
+    s_memcpy(s,t,len);
+    s[len] = '\0';
+    str_setlen(s,len);
+    return s;
+}
+
+STRING str_cpy(STRING s,const char* t)
+{
+    return str_cpylen(s,t,strlen(t));
+}
+
+STRING str_trim(STRING s,const char* cset)
+{
+    char *start,*end,*sp,*ep;
+
+    size_t len;
+
+    sp = start = s;
+    ep = end = s + STR_LEN(s) + 1;
+
+    while(sp <= end && strchr(cset,*sp)) sp++;
+
+    while(ep > sp && strchr(cset,*ep)) ep --;
+
+    len = (sp > ep) ? 0 : ((ep - sp) + 1);
+    if(s != sp) s_memmove(s,sp,len);
+
+    s[len] = '\0';
+    str_setlen(s,len);
+    return s;
+}
+
 
 
 

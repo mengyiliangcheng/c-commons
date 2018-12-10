@@ -31,6 +31,7 @@ typedef struct
 #define s_memcpy memcpy
 #define s_free free
 #define s_realloc realloc
+#define s_memmove memmove
 
 typedef char* STRING;
 
