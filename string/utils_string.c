@@ -429,7 +429,137 @@ void strings_delete(ST_UTILS_STRINGS* str)
     commons_free(str);
 }
 
+#ifdef UTILS_STRINGS_API_2
 
+
+
+static inline size_t str_hdr_size(void)
+{
+    return sizeof(ST_STR_HDR);
+}
+
+
+STRING str_new_len(const void* init,size_t initlen)
+{
+    ST_STR_HDR* sh;
+    STRING s;
+
+    sh = s_malloc(STR_HDR_SIZE + initlen + 1);
+    if(!sh) return NULL;
+
+    if(!init)
+        BZERO(sh,STR_HDR_SIZE + initlen + 1);
+
+    s = (char*)sh + STR_HDR_SIZE;
+
+    sh->len = initlen;
+    sh->alloc = initlen;
+
+    if(init && initlen)
+        s_memcpy(s,init,initlen);
+
+    s[initlen] = '\0';
+
+    return s;
+}
+
+STRING str_empty(void)
+{
+    return str_new_len("",0);
+}
+
+STRING str_new(const char* init)
+{
+    size_t initlen = (NULL == init) ? 0 : strlen(init);
+    return str_new_len(init,initlen);
+}
+
+STRING str_dup(STRING s)
+{
+    return str_new_len(s,STR_LEN(s));
+}
+
+void str_free(STRING s)
+{
+    if(!s)
+        return;
+    s_free(STR_HDR(s));
+}
+
+void str_setlen(STRING s,size_t newlen)
+{
+    STR_HDR(s)->len = newlen;
+    return;
+}
+
+void str_updatelen(STRING s)
+{
+    int reallen = strlen(s);
+    str_setlen(s,reallen);
+}
+
+void str_clear(STRING s)
+{
+    str_setlen(s,0);
+    s[0] = '\0';
+}
+
+STRING str_make_room_for(STRING s,size_t addlen)
+{
+    ST_STR_HDR* newsh;
+    size_t newlen;
+    if(STR_AVAIL(s) >= addlen)
+        return s;
+
+    /* alloc a big enough room for string*/
+    newlen = STR_LEN(s) + addlen;
+    if(newlen < STR_MAX_PREALLOC)
+        newlen *= 2;
+    else
+        newlen += STR_MAX_PREALLOC;
+    
+    newsh = s_realloc(STR_HDR(s),STR_HDR_SIZE + newlen + 1);
+    if(!newsh) return NULL;
+
+    /*refresh data pointer*/
+    s = newsh->buf;
+
+    /*refresh alloc*/
+    newsh->alloc = newlen;
+
+    return s;
+}
+
+void str_inclen(STRING s,size_t incr)
+{
+    assert(incr > 0 && (STR_HDR(s)->alloc -STR_HDR(s)->len > incr));
+    s[STR_HDR(s)->len + incr] = '\0';
+}
+
+STRING str_catlen(STRING s,const void* t,size_t len)
+{
+    size_t currentlen = STR_LEN(s);
+
+    s= str_make_room_for(s,len);
+    if(!s) return NULL;
+
+    s_memcpy(s+currentlen,t,len);
+
+    str_setlen(s,currentlen + len);
+
+    s[currentlen + len] = '\0';
+
+    return s;
+}
+
+STRING str_cat(STRING s,const void * t)
+{
+    str_catlen(s,t,strlen(t));
+}
+
+
+
+#endif
 
 
 
