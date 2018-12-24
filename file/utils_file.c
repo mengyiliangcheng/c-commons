@@ -11,6 +11,9 @@
  
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <utils_string.h>
 #include "utils_file.h"
 #include "digest.h"
 #include "zlib.h"
@@ -39,6 +42,22 @@ BOOL file_exist(s8* file_path)
     return TRUE;
 }
 
+BOOL file_dir_exist(s8* dir_path)
+{
+    if(NULL == dir_path)
+    {
+        return FALSE;
+    }
+    DIR* dir = opendir(dir_path);
+
+    if(NULL == dir)
+    {
+        return FALSE;
+    }
+    closedir(dir);
+    return TRUE;
+}
+
 s32 file_write(s8* file_path,s8* in,s32 len)
 {
     if(NULL == file_path || NULL == in)
@@ -61,6 +80,45 @@ s32 file_write(s8* file_path,s8* in,s32 len)
     return ret;
 }
 
+typedef int (*file_find_callback) (s8* dir,s8* path);
+
+int file_find(s8* base_path,s8* file_name,file_find_callback func)
+{    
+    char buffer[256];
+    struct dirent *dir_entry = NULL;
+    struct dirent *dir_entry_next = NULL;
+    DIR* dir = NULL;
+
+    if(!file_dir_exist(base_path))
+        return -1;
+
+    dir = opendir(base_path);
+    if(NULL == dir)
+    {
+        return -1;
+    }
+    while((dir_entry = readdir(dir)) != NULL)
+    {
+        BZERO(buffer,sizeof(buffer));
+        sprintf(buffer,"%s/%s",base_path,dir_entry->d_name);    
+        //commons_println("file name:%s",buffer);
+        if(0 == strncmp(dir_entry->d_name,"..",2) || 0 == strncmp(dir_entry->d_name,".",1))
+            continue;
+        if(0 == strncmp(dir_entry->d_name,file_name,strlen(file_name)))
+        {
+            //commons_println("find!!!file name:%s",buffer);
+            func(base_path,buffer);
+            continue;
+        }
+        if(4 == dir_entry->d_type)
+        {
+            if(0 != file_find(buffer,file_name,func))
+                break;
+        }
+    }
+    closedir(dir);
+    return 0;
+}
 
 s32 file_read(s8* file_path,s8* out,s32 len)
 {
@@ -380,7 +438,7 @@ typedef struct
 {
     char reason[128];
     char descript[256];
-    /* 1-使用上次状态 2-输出后面一个字节*/
+    /* 1-使用上次状态 2-输出后面一个字节 3-开始上报 4-上报结束*/
     int record_type;
     char last_descript[256];
 }ST_ANALYZE_LOG;
@@ -391,17 +449,19 @@ ST_ANALYZE_LOG TAB_ANALYZE_LOG[] =
     {"[gps] JSON"                       ,"定位成功"},
     {"===========tracker service has start=============","应用启动",1,"进入psm"},
     {"flp position wait timeout"        ,"定位失败"},
-    {"dev logout",                      "上报数据失败"},
-    {"start task,dev status:"           ,"开始上报"},
-    {"report succ,current total count"  ,"上报成功"},
+    {"dev logout",                      "上报数据失败",5},
+    {"start task,dev status:"           ,"开始上报",3},
+    {"report succ,current total count"  ,"上报成功",4},
     {"HandleAppItem: sid:86, cid:2",    "mcu通知定位"},
-    {"timeout int 35 s!!!",             "hilink登录云模式超时"},
+    {"timeout int 35 s!!!",             "hilink登录云模式超时",5},
     {"start report cache hander"        ,"触发上报"},
     {"AT+CPSMS=1, Psm Open Status"      ,"sleep模块使能psm"},
     {"AT+CPSMS=0, Psm Close Status."    ,"sleep模块关闭psm"},
     {"MCU  wakeup event "               ,"休眠唤醒"},
     {"Received SOS msg"                 ,"mcu触发sos"},
-    {"[Alarm] JSON:{\"code\":1"         ,"收到满电报警"},
+    //{"[Alarm] JSON:{\"code\":1,"         ,"收到满电报警"},
+    {"[Alarm] JSON:{\"code\":4,"         ,"收到进无服务区报警"},
+    {"[Alarm] JSON:{\"code\":11,"         ,"收到出无服务区报警"},
     {"[Alarm] JSON:{\"code\":6"         ,"收到出围栏告警"},
     {"[Alarm] JSON:{\"code\":7"         ,"收到sos告警"},
     {"The system will shutdown"         ,"mcu通知9206关机"},
@@ -411,6 +471,7 @@ ST_ANALYZE_LOG TAB_ANALYZE_LOG[] =
     {"report failed:no reg network",     "上报失败，没注网"},
     {"Sntp Sync successed!!!!",          "nitz/sntp校时成功"},
     {"Test  power_on_reason****"         ,"唤醒原因:",              2},
+    {"HandleAppItem: sid:86, cid:3"      ,"mcu通知上报电池电量"},
 };
 
 const char *const boot_reason_list[8] =
@@ -421,21 +482,37 @@ const char *const boot_reason_list[8] =
 };
 
 
-void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time)
+void analyze_log(s8* path,s8* start_time,s8* end_time,BOOL b_check_time)
 {
     FILE* fp = NULL;
     FILE* analyze_res_fp = NULL;
-    fp = fopen("./tracker.log","r+");
     char tmp[1024];
+    char output_path[1014];
     char s_date[128];
     char buffer[1024];
     char s_last_record[1024];
     char s_last_date[128];
+    char s_start_report_ts[128];
     BOOL start_flag = FALSE;
     time_t time_tmp;
+    time_t report_time;
     int i = 0;
-    unlink("./result.csv");
-    analyze_res_fp = fopen("./result.csv","a+");
+    int report_count = 0;
+
+    if(!path)
+    {
+        commons_println("invalid param");
+        return;
+    }
+
+    BZERO(tmp,sizeof(tmp));
+    sprintf(tmp,"%s/tracker.log",path);
+    fp = fopen(tmp,"r+");
+
+    BZERO(output_path,sizeof(output_path));
+    sprintf(output_path,"%s/result.csv",path);
+    unlink(output_path);
+    analyze_res_fp = fopen(output_path,"a+");
 
     if(fp == NULL || analyze_res_fp == NULL)
     {
@@ -463,6 +540,12 @@ void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time)
         {
             if(strstr(tmp,TAB_ANALYZE_LOG[i].reason))
             {
+                if(3 == TAB_ANALYZE_LOG[i].record_type)
+                {
+                    bzero(s_start_report_ts,sizeof(s_start_report_ts));
+                    memcpy(s_start_report_ts,tmp,15);
+                }
+                
                 if(1 == TAB_ANALYZE_LOG[i].record_type)
                 {
                     bzero(buffer,sizeof(buffer));
@@ -483,7 +566,30 @@ void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time)
                     int boot_reason = atoi((pos+strlen(TAB_ANALYZE_LOG[i].reason)));
                     //commons_println("boot reason:%d",boot_reason);
                     sprintf(buffer,"%s,%s%s,\n",s_date,TAB_ANALYZE_LOG[i].descript,boot_reason_list[boot_reason]);
-                }else
+                }
+                else if(4 == TAB_ANALYZE_LOG[i].record_type)
+                {
+                    if(strlen(s_start_report_ts) > 3)
+                    {
+                        report_time = utils_strptime_compare(s_date,s_start_report_ts,"%h %e %T");
+                        sprintf(buffer,"%s,%s,,1,,%d\n",s_date,TAB_ANALYZE_LOG[i].descript,report_time);
+                    }else
+                    {
+                        sprintf(buffer,"%s,%s,\n",s_date,TAB_ANALYZE_LOG[i].descript);
+                    }
+                }
+                else if(5 == TAB_ANALYZE_LOG[i].record_type)
+                {
+                    if(strlen(s_start_report_ts) > 3)
+                    {
+                        report_time = utils_strptime_compare(s_date,s_start_report_ts,"%h %e %T");
+                        sprintf(buffer,"%s,%s,,,1,%d\n",s_date,TAB_ANALYZE_LOG[i].descript,report_time);
+                    }else
+                    {
+                        sprintf(buffer,"%s,%s,\n",s_date,TAB_ANALYZE_LOG[i].descript);
+                    }
+                }
+                else
                 {
                     sprintf(buffer,"%s,%s,\n",s_date,TAB_ANALYZE_LOG[i].descript);
                 }
@@ -512,9 +618,23 @@ void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time)
     }
     fclose(fp);
     fclose(analyze_res_fp);
-    commons_println("analyze log finish,output file:./result.csv");
+
+    commons_println("output:%s",output_path);
 }
 
+#define LOG_BASE_DIR "./tracker-log"
+
+int analyze_log_callback(s8* dir,s8* path)
+{  
+    //commons_println("dir:%s",dir);
+    analyze_log(dir,"Nov 20 05:50:30","Nov 21 12:21:58",FALSE);
+}
+
+
+void analyze_log_client(void)
+{
+    file_find(LOG_BASE_DIR,"tracker.log",analyze_log_callback);
+}
 
 
  

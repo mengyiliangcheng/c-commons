@@ -35,6 +35,7 @@ extern int testConvertTime();
 extern int testThreadCond();
 extern int testCreateServer();
 extern int testCreateClient();
+extern int testHexToString(void);
 extern int testCurl();
 
 #endif

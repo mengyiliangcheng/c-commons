@@ -91,9 +91,20 @@ s32 strings_to_hex(const u8* src,s32 src_len,u8* dest)
     return 0;
 }
 
-s32 strings_hex_to_str(const u8* src,s32 src_len,u8* dest)
+s32 strings_hex_to_str(const u8* src,s32 src_len,u8* dest,s32 uppercase)
 {
-    
+    static char    *zEncode[] = {"0123456789abcdef", "0123456789ABCDEF"};
+    int             j = 0;
+    int             i = 0;
+    int             idx = uppercase ? 1 : 0;
+
+    for (i = 0; i < src_len; i ++) {
+        int         a = src[i];
+
+        dest[j++] = zEncode[idx][(a >> 4) & 0xf];
+        dest[j++] = zEncode[idx][a & 0xf];
+    }
+    return 0;
 }
 
 s32 strings_len(const s8* str)

@@ -42,6 +42,7 @@ ST_TEST_LIST TabTestList[] =
     {"testThreadCond",             testThreadCond},
     {"testCreateServer",           testCreateServer},
     {"testCreateClient",           testCreateClient},
+    {"testHexToString",            testHexToString},
     {"testCurl",                   testCurl},
     
 #endif
@@ -124,6 +125,19 @@ int testStringToHex()
     commons_print_hex(buffer,strlen(input) / 2 + strlen(input) % 2);
 
     return 0;
+}
+
+int testHexToString(void)
+{
+    char key1[]={ 0x08,0x09,0x0b,0x00,0x00,0x03,0x08,0x00,0x0a,0x03, \
+                                        0x0f,0x01,0x01,0x0f,0x01,0x0a,0x0f,0x06,0x02,0x00, \
+                                        0x01,0x02,0x06,0x09,0x07,0x0b,0x03,0x07,0x0b,0x09, \
+                                        0x0b,0x09};
+    char buffer[1024] = {0};
+    
+    strings_hex_to_str(key1,sizeof(key1),buffer,1);
+    
+    commons_println("buffer:%s",buffer);
 }
 
 int testCommonsScanf()
@@ -242,7 +256,7 @@ int testCbcEncrypt()
 
 int testAnalyzeLog()
 {
-    analyze_log("Nov 20 05:50:30","Nov 21 12:21:58",FALSE);
+    analyze_log_client();
 }
 
 int testConvertTime()

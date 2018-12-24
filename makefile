@@ -16,8 +16,8 @@ else
 endif
 
 DYNAMIC_LIBS_DIR = -L./xml/lib -L./libs -L./openssl/lib
-DYNAMIC_LIBS = -lsdkxml -lsdkz -lcurl #-lcrypto -lssl
-STATIC_LIBS = ./openssl/lib/libcrypto.a ./openssl/lib/libssl.a
+DYNAMIC_LIBS = -lsdkxml -lsdkz #-lcrypto -lssl
+STATIC_LIBS = ./openssl/lib/libcrypto.a ./openssl/lib/libssl.a ./libs/libcurl.a
 
 CUR_PWD=$(shell pwd)
 

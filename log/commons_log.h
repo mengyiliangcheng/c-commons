@@ -24,6 +24,6 @@ extern u8* commons_get_shortname(u8* path);
        }while(0) 
 
 
-extern void analyze_log(s8* start_time,s8* end_time,BOOL b_check_time);
+extern void analyze_log_client(void);
 #endif
 
