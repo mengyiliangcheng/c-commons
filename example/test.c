@@ -42,6 +42,7 @@ ST_TEST_LIST TabTestList[] =
     {"testThreadCond",             testThreadCond},
     {"testCreateServer",           testCreateServer},
     {"testCreateClient",           testCreateClient},
+    {"testCurl",                   testCurl},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -286,6 +287,11 @@ int testCreateClient()
     utils_thread_create_thread((void*)utils_network_create_client,NULL);
 
     utils_thread_p(semid,0);
+}
+
+int testCurl()
+{
+    open_webservice();
 }
 
 int testOthers()

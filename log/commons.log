@@ -1,0 +1,162 @@
+create new processthis is parent process!pid:1562this is child process!pid:1563create thread succDec 10 06:42:50 create new process/r/nDec 10 06:42:50 this is parent process!pid:1724/r/nDec 10 06:42:50 this is child process!pid:1725/r/nDec 10 06:45:01 create new process
+Dec 10 06:45:01 this is parent process!pid:1882
+Dec 10 06:45:01 this is child process!pid:1883
+Dec 10 06:45:14 create thread succ
+Dec 10 06:47:54 create new process
+Dec 10 06:47:54 this is parent process!pid:2043
+Dec 10 06:47:54 this is child process!pid:2044
+Dec 10 06:47:54 server socket:4
+Dec 10 06:47:54 start services...
+Dec 10 06:48:02 create thread succ
+Dec 10 06:48:02 thread_one:int 2043 main process, the tid=1970145024,pid=2045
+
+Dec 10 06:48:02 send messages:0
+Dec 10 06:48:02 detect request...
+Dec 10 06:48:02 request fd:4,server fd:4
+Dec 10 06:48:02 add client fd:6
+Dec 10 06:48:20 send messages:0,15
+Dec 10 06:48:20 Message from client (256)) :15
+Dec 10 06:48:20 Write Message To client  :Dec 10 06:48:20 ::15
+Dec 10 06:48:20 start services...
+Dec 10 06:48:20 read from server:[Dec 10 06:48:20 ::15]
+Dec 10 06:48:20 send messages:0
+Dec 10 06:49:18 create new process
+Dec 10 06:49:18 this is parent process!pid:2201
+Dec 10 06:49:18 this is child process!pid:2202
+Dec 10 06:49:18 server socket:4
+Dec 10 06:49:18 start services...
+Dec 10 06:49:24 create thread succ
+Dec 10 06:49:24 thread_one:int 2201 main process, the tid=2544764672,pid=2203
+
+Dec 10 06:49:24 send messages:0
+Dec 10 06:49:24 detect request...
+Dec 10 06:49:24 request fd:4,server fd:4
+Dec 10 06:49:24 add client fd:6
+Dec 10 06:57:57 create new process
+Dec 10 06:57:57 this is parent process!pid:2360
+Dec 10 06:57:57 this is child process!pid:2361
+Dec 10 06:57:57 server socket:4
+Dec 10 06:57:57 start services...
+Dec 10 06:57:59 create thread succ
+Dec 10 06:57:59 thread_one:int 2360 main process, the tid=1733166848,pid=2362
+
+Dec 10 06:57:59 send messages:0
+Dec 10 06:57:59 detect request...
+Dec 10 06:57:59 request fd:4,server fd:4
+Dec 10 06:57:59 add client fd:6
+Dec 10 07:00:53 create new process
+Dec 10 07:00:53 this is parent process!pid:2519
+Dec 10 07:00:53 this is child process!pid:2520
+Dec 10 07:00:53 server socket:4
+Dec 10 07:00:53 start services...
+Dec 10 07:01:17 create thread succ
+Dec 10 07:01:17 thread_one:int 2519 main process, the tid=1791887104,pid=2522
+
+Dec 10 07:01:17 send messages:0
+Dec 10 07:01:17 detect request...
+Dec 10 07:01:17 request fd:4,server fd:4
+Dec 10 07:01:17 add client fd:6
+Dec 10 07:01:34 create thread succ
+Dec 10 07:01:34 thread_one:int 2519 main process, the tid=1783432960,pid=2525
+
+Dec 10 07:01:34 send messages:0
+Dec 10 07:05:34 send messages:0,16
+Dec 10 07:05:34 Message from client (256)) :16
+Dec 10 07:05:34 Write Message To client  :Dec 10 07:05:34 ::16
+Dec 10 07:05:34 start services...
+Dec 10 07:05:34 read from server:[Dec 10 07:05:34 ::16]
+Dec 10 07:05:34 detect request...
+Dec 10 07:05:34 send messages:0
+Dec 10 07:05:34 request fd:4,server fd:4
+Dec 10 07:05:34 add client fd:7
+Dec 10 07:05:53 send messages:0,16
+Dec 10 07:05:53 Message from client (256)) :16
+Dec 10 07:05:53 Write Message To client  :Dec 10 07:05:53 ::16
+Dec 10 07:05:53 start services...
+Dec 10 07:05:53 read from server:[Dec 10 07:05:53 ::16]
+Dec 10 07:05:53 send messages:0
+Dec 10 07:09:33 create thread succ
+Dec 10 07:09:33 thread_one:int 2519 main process, the tid=1774978816,pid=2529
+
+Dec 10 07:09:33 send messages:0
+Dec 10 07:09:33 detect request...
+Dec 10 07:09:33 request fd:4,server fd:4
+Dec 10 07:09:33 add client fd:8
+Dec 10 07:09:40 send messages:0,16
+Dec 10 07:09:40 read from server:[]
+Dec 10 07:09:40 send messages:0
+Dec 10 07:15:57 send messages:0,jlajd
+Dec 10 07:15:57 read from server:[]
+Dec 10 07:15:57 send messages:0
+Dec 10 07:17:47 create new process
+Dec 10 07:17:47 this is parent process!pid:2686
+Dec 10 07:17:47 this is child process!pid:2687
+Dec 10 07:17:47 server socket:4
+Dec 10 07:17:47 start services...
+Dec 10 07:17:48 create thread succ
+Dec 10 07:17:48 thread_one:int 2686 main process, the tid=3754821376,pid=2688
+
+Dec 10 07:17:48 detect request...
+Dec 10 07:17:48 request fd:4,server fd:4
+Dec 10 07:17:48 add client fd:6
+Dec 10 07:17:48 cannot read client message,err:Invalid argument
+Dec 10 07:17:48 start services...
+Dec 10 07:19:25 create new process
+Dec 10 07:19:25 this is parent process!pid:2845
+Dec 10 07:19:25 this is child process!pid:2846
+Dec 10 07:19:25 server socket:4
+Dec 10 07:19:25 start services...
+Dec 10 07:19:27 create thread succ
+Dec 10 07:19:27 thread_one:int 2845 main process, the tid=1538131712,pid=2847
+
+Dec 10 07:19:27 detect request...
+Dec 10 07:19:27 request fd:4,server fd:4
+Dec 10 07:19:27 add client fd:6
+Dec 10 07:19:41 send messages:0,jkjkjkj
+Dec 10 07:19:41 Message from client (256)) :jkjkjkj
+Dec 10 07:19:41 Write Message To client  :Dec 10 07:19:41 ::jkjkjkj
+Dec 10 07:19:41 start services...
+Dec 10 07:19:41 read from server:[Dec 10 07:19:41 ::jkjkjkj]
+Dec 10 07:22:38 send messages:0,jksdlfjlad
+Dec 10 07:22:38 read from server:[]
+Dec 10 07:23:38 send messages:0,sdfasdf
+Dec 10 07:23:38 read from server:[]
+Dec 10 08:44:03 create new process
+Dec 10 08:44:03 this is parent process!pid:3611
+Dec 10 08:44:03 this is child process!pid:3612
+Dec 10 08:44:03 server socket:4
+Dec 10 08:44:03 start services...
+Dec 10 08:44:04 semctl failed,err:-1982053926
+Dec 10 08:44:04 create thread succ
+Dec 10 08:44:04 thread_one:int 3611 main process, the tid=2261649152,pid=3613
+
+Dec 10 08:44:04 detect request...
+Dec 10 08:44:04 request fd:4,server fd:4
+Dec 10 08:44:04 add client fd:6
+Dec 10 08:44:15 send messages:0,jkadlfjkadf
+Dec 10 08:44:15 Message from client (256)) :jkadlfjkadf
+Dec 10 08:44:15 Write Message To client  :Dec 10 08:44:15 ::jkadlfjkadf
+Dec 10 08:44:15 start services...
+Dec 10 08:44:15 read from server:[Dec 10 08:44:15 ::jkadlfjkadf]
+Dec 10 08:44:22 send messages:0,asdfasdf
+Dec 10 08:44:22 read from server:[]
+Dec 10 09:07:45 create new process
+Dec 10 09:07:45 this is parent process!pid:4083
+Dec 10 09:07:45 this is child process!pid:4084
+Dec 10 09:07:45 server socket:4
+Dec 10 09:07:45 start services...
+Dec 10 09:07:46 semctl failed,err:-1740881446
+Dec 10 09:07:46 create thread succ
+Dec 10 09:07:46 thread_one:int 4083 main process, the tid=2502821632,pid=4085
+
+Dec 10 09:07:46 detect request...
+Dec 10 09:07:46 request fd:4,server fd:4
+Dec 10 09:07:46 add client fd:6
+Dec 10 09:08:19 send messages:0,1jkjksdka
+Dec 10 09:08:19 Message from client (256)) :1jkjksdka
+Dec 10 09:08:19 Write Message To client  :Dec 10 09:08:19 ::1jkjksdka
+Dec 10 09:08:19 start services...
+Dec 10 09:08:19 read from server:[Dec 10 09:08:19 ::1jkjksdka]
+Dec 10 09:08:33 send messages:0,adsfasdfjkajdkf
+Dec 10 09:08:33 read from server:[]
+Dec 10 09:08:41 send messages:0,exit

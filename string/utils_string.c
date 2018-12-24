@@ -601,8 +601,50 @@ STRING str_trim(STRING s,const char* cset)
     return s;
 }
 
+/*
+* Turn the string into a smaller or equal string containing only the 
+* substring specified by the `start` and `end` indexes.
+*/
+void str_range(STRING s,ssize_t start,ssize_t end)
+{
+    int len = STR_LEN(s);
+    int newlen;
 
+    if(0 == len) return;
 
+    /*start can be negative */
+    if(start < 0)
+    {
+        start = len + start;
+        if(start < 0) start = 0;
+    }
+    /*end can be negative*/
+    if(end < 0)
+    {
+        end = len + end;
+        if(end < 0) end = 0;
+    }
+    /*length of new string*/
+    newlen = (start > end) ? 0 : (end - start) + 1;
+    if(0 != newlen)
+    {
+        if(start >= len)
+        {
+            newlen = 0;
+        }else if(end >= len)
+        {
+            end = len -1;
+            newlen = (start - end) ? 0 : (end - start) + 1;
+        }
+    }else
+    {
+        start = 0;
+    }
+
+    if(start && newlen) s_memmove(s,s+start,newlen);
+    s[newlen] = '\0';
+    str_setlen(s,newlen);
+}
 
 #endif
 
