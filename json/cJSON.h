@@ -269,6 +269,7 @@ CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number);
 /* malloc/free objects using the malloc/free functions that have been set with cJSON_InitHooks */
 CJSON_PUBLIC(void *) cJSON_malloc(size_t size);
 CJSON_PUBLIC(void) cJSON_free(void *object);
+CJSON_PUBLIC(const char *) cJSON_GetErrorPtr(void);
 
 #ifdef __cplusplus
 }
