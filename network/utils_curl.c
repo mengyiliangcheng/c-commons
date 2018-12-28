@@ -660,7 +660,7 @@ int book_ticket_model(CURL *easy_handle)
 
     for(i = 0;i < ctx->person_num;i ++)
     {
-        if(0 == strcmp(ctx->person_info[i].IdNumber,SELECT_ID_USED))
+        if(0 == strcmp(ctx->person_info[i].IdNumber,SELECT_ID))
         {
             LOG("find,%s!",ctx->person_info[i].IdNumber);
             break;
@@ -677,23 +677,23 @@ int book_ticket_model(CURL *easy_handle)
     }
     
     sprintf(post_data,
-        "param=orderAPI \
-        &hospitalId=61010017 \
-        &patientId=%s \
-        &clinicLabelId=%s \
-        &clinicDate=%s \
-        &timePartType=%d \
-        &timePart= \
-        &channcelType=%d \
-        &rsvmodel=%d \
-        &returnVisitId=%d \
-        &symptom=  \
-        &cardnum=%s \
-        &TimePartStartTime=%s \
-        &TimePartEndTime=%s \
-        &ScheduleItemCode=%s \
-        &payChanel=%d \
-        ",
+        "param=orderAPI\
+&hospitalId=61010017\
+&patientId=%s\
+&clinicLabelId=%s\
+&clinicDate=%s \
+&timePartType=%d\
+&timePart=\
+&channcelType=%d\
+&rsvmodel=%d\
+&returnVisitId=%d\
+&symptom=\
+&cardnum=%s\
+&TimePartStartTime=%s\
+&TimePartEndTime=%s\
+&ScheduleItemCode=%s\
+&payChanel=%d\
+",
         ctx->person_info[i].PersonId,
         ctx->clinic_label_id,
         ctx->clinic_date,
@@ -709,7 +709,7 @@ int book_ticket_model(CURL *easy_handle)
         );
     ctx = curl_ctx_release(ctx);
     printf("post_data:[%s]\r\n",post_data);
-#if 0
+#if 1
     curl_easy_reset(easy_handle);
     curl_easy_setopt(easy_handle,CURLOPT_URL,URL_BOOK_TICKET);
     curl_easy_setopt(easy_handle,CURLOPT_POSTFIELDS, post_data);
@@ -765,7 +765,7 @@ void open_webservice(void)
 
     get_verify_code(easy_handle);
     
-#if 0
+#if 1
     unlink("./result.txt");
     system("tesseract verfycode.jpg result");
     sleep(2);
@@ -792,7 +792,7 @@ void open_webservice(void)
 
     while(1)
     {
-        ret = enter_doctor_interface(easy_handle,DOCTOR_ID_USED);
+        ret = enter_doctor_interface(easy_handle,DOCTOR_ID_TEST);
         if(ret != 0)
         {
             LOG("try again....");
