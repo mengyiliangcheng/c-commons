@@ -37,6 +37,8 @@ extern int testCreateServer();
 extern int testCreateClient();
 extern int testHexToString(void);
 extern int testCurl();
+extern int testEvent(void);
+extern int testEventClient(void);
 
 #endif
 

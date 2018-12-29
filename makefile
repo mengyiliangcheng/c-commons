@@ -38,7 +38,8 @@ export HEAD_DIR = -I./mempool \
            -I./includes \
            -I./zlib/contrib/minizip \
            -I./openssl/include \
-           -I./network           
+           -I./network \
+           -I./event
            
 #SOURCES = $(wildcard *.c)
 SOURCES = $(wildcard */*.c)

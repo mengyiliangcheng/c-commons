@@ -709,7 +709,7 @@ int book_ticket_model(CURL *easy_handle)
         );
     ctx = curl_ctx_release(ctx);
     printf("post_data:[%s]\r\n",post_data);
-#if 1
+#if 0
     curl_easy_reset(easy_handle);
     curl_easy_setopt(easy_handle,CURLOPT_URL,URL_BOOK_TICKET);
     curl_easy_setopt(easy_handle,CURLOPT_POSTFIELDS, post_data);
@@ -765,7 +765,7 @@ void open_webservice(void)
 
     get_verify_code(easy_handle);
     
-#if 1
+#if 0
     unlink("./result.txt");
     system("tesseract verfycode.jpg result");
     sleep(2);

@@ -9,13 +9,17 @@
 *
 */
 
-#ifndef __UTILS_NETWORK_H__
-#define __UTILS_NETWORK_H__
+#ifndef __CEVENT_POOL_H__
+#define __CEVENT_POOL_H__
 
-extern int utils_network_create_server(void);
-extern s32 utils_network_create_client(void);
-extern int utils_network_create_socket_server(void);
-extern int Client(char* unixSocket);
+typedef struct ST_POOL_API_STATE {
+    int epfd;
+    struct epoll_event *events;
+}ST_POOL_API_STATE;
+
+extern int ceApiPoll(ST_EVENT_LOOP *eventLoop, struct timeval *tvp);
+extern int aeApiAddEvent(ST_EVENT_LOOP *eventLoop, int fd, int mask);
+extern void aeApiDelEvent(ST_EVENT_LOOP *eventLoop, int fd, int delmask);
 
 
 #endif

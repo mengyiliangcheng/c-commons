@@ -26,6 +26,9 @@
 #define BZERO(dest,count)   (commons_memset(dest,0,count))
 #define Assert(x) assert(x)
 
+#define UNUSED(V) ((void) V)
+
+
 typedef enum
 {
     SCANF_STRING,

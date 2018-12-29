@@ -8,14 +8,14 @@
 * limitations under the License.
 *
 */
+#ifndef __ANET_H__
+#define __ANET_H__
 
-#ifndef __UTILS_NETWORK_H__
-#define __UTILS_NETWORK_H__
+#define MAX_ACCEPTS_PER_CALL 1000
+#define NET_IP_STR_LEN 46 /* INET6_ADDRSTRLEN is 46, but we need to be sure */
+#define CLIENT_UNIX_SOCKET (1<<11) /* Client connected via Unix domain socket */
 
-extern int utils_network_create_server(void);
-extern s32 utils_network_create_client(void);
-extern int utils_network_create_socket_server(void);
-extern int Client(char* unixSocket);
-
+extern void acceptTcpHandler(ST_EVENT_LOOP *el, int fd, void *privdata, int mask);
+extern void acceptUnixHandler(ST_EVENT_LOOP *el, int fd, void *privdata, int mask);
 
 #endif

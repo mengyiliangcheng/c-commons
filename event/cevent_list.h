@@ -9,13 +9,9 @@
 *
 */
 
-#ifndef __UTILS_NETWORK_H__
-#define __UTILS_NETWORK_H__
+#ifndef __CEVENT_LIST_H__
+#define __CEVENT_LIST_H__
 
-extern int utils_network_create_server(void);
-extern s32 utils_network_create_client(void);
-extern int utils_network_create_socket_server(void);
-extern int Client(char* unixSocket);
 
 
 #endif

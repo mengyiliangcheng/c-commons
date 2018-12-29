@@ -16,6 +16,7 @@
 #include "utils_xml.h"
 #include "utils_network.h";
 #include "test.h"
+#include "cevent.h"
 
 #ifdef USE_PRINTLN
 #define LOG commons_println
@@ -44,6 +45,8 @@ ST_TEST_LIST TabTestList[] =
     {"testCreateClient",           testCreateClient},
     {"testHexToString",            testHexToString},
     {"testCurl",                   testCurl},
+    {"testEvent",                  testEvent},
+    {"testEventClient",            testEventClient},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -288,6 +291,16 @@ int testCreateThread()
 int testCreateServer()
 {
     utils_thread_create_process("./network/test/testServer.elf");
+}
+
+int testEvent(void)
+{
+    serverMain();
+}
+
+int testEventClient(void)
+{
+    Client("/tmp/mc_socket");
 }
 
 int testCreateClient()

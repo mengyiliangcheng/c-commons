@@ -454,6 +454,8 @@ ST_ANALYZE_LOG TAB_ANALYZE_LOG[] =
     {"report succ,current total count"  ,"上报成功",4},
     {"HandleAppItem: sid:86, cid:2",    "mcu通知定位"},
     {"timeout int 35 s!!!",             "hilink登录云模式超时",5},
+    {"report failed:no network",        "上报失败，未拨号"},  
+    {"report failed:no reg network",     "上报失败，没注网"},
     {"start report cache hander"        ,"触发上报"},
     {"AT+CPSMS=1, Psm Open Status"      ,"sleep模块使能psm"},
     {"AT+CPSMS=0, Psm Close Status."    ,"sleep模块关闭psm"},
@@ -468,10 +470,11 @@ ST_ANALYZE_LOG TAB_ANALYZE_LOG[] =
     {"psmEnable sig : 1"                ,"mcu通知可以进入psm"},
     {"psmEnable sig : 0"                ,"mcu通知不可以进入psm"},
     {"Current Dialup Status Changed to 1","拨号成功"},
-    {"report failed:no reg network",     "上报失败，没注网"},
     {"Sntp Sync successed!!!!",          "nitz/sntp校时成功"},
     {"Test  power_on_reason****"         ,"唤醒原因:",              2},
     {"HandleAppItem: sid:86, cid:3"      ,"mcu通知上报电池电量"},
+    {"Current Network Changed to 0",      "注网状态变为0"},
+    {"Current Network Changed to 1",      "注网状态变为1"},
 };
 
 const char *const boot_reason_list[8] =

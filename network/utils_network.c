@@ -18,21 +18,16 @@
 #include <sys/syscall.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "commons_log.h"
 #include "osadapter.h"
 #include "utils_sem.h"
 #include <time.h>
 
-#ifdef LOG
-#undef LOG
-#endif
 
-#define LOG_USE_PRINTLN
-#ifdef LOG_USE_PRINTLN
-#define LOG commons_logger
-#else
 #define LOG(...) COMMONS_LOG("NETWORK",__VA_ARGS__);
-#endif
+
 
 
 #define UNIX_DOMAIN "/tmp/unix_socket"
@@ -405,6 +400,69 @@ s32 utils_network_create_socket_client(void)
     return 0;
 }
 
+
+int Client(char* unixSocket)
+{
+    int connect_fd;
+    int ret;
+    char buf[256];
+    int i;
+    struct sockaddr_un svr_addr;
+
+    //LOG("current pid:%d",getpid());
+    LOG("thread_one:int %d main process, the tid=%lu,pid=%ld\n",getpid(),pthread_self(),syscall(SYS_gettid));
+    LOG("unixSocket:%s\n",unixSocket);
+
+    connect_fd = socket(PF_UNIX,SOCK_STREAM,0);
+    if(connect_fd < 0)
+    {
+        LOG("create socket failed,err:%s",strerror(errno));
+        return -1;
+    }
+
+    /* connect to server*/
+    svr_addr.sun_family = AF_UNIX;
+    strcpy(svr_addr.sun_path,unixSocket);
+
+    ret = connect(connect_fd,(struct sockaddr*)&svr_addr,sizeof(svr_addr));
+    if(-1 == ret)
+    {
+        LOG("connect to server failed,err:%s",strerror(errno));
+        close(connect_fd);
+        return -1;
+    }
+    LOG("connect to server succ");
+    
+
+    for(i = 0;i < 10;i ++)
+    {
+        bzero(buf,sizeof(buf));
+        strcpy(buf,"hello from client");
+        ret = write(connect_fd,buf,sizeof(buf));
+        if(ret < 0)
+        {
+            LOG("write to server failed,err:%s",strerror(errno));
+            close(connect_fd);
+            return -1;
+        }
+        LOG("write to server succ");
+   
+
+        bzero(buf,sizeof(buf));
+        ret = read(connect_fd,buf,sizeof(buf));
+        if(ret < 0)
+        {
+            LOG("read from server failed,err:%s",strerror(errno));
+            close(connect_fd);
+            return -1;
+        }
+        LOG("read from server:[%s]",buf);
+        sleep(4);
+    }
+    close(connect_fd);
+
+    return 0;
+}
 
 
 
