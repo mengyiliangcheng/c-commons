@@ -12,10 +12,15 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/epoll.h>
+#include <errno.h>
 #include "osadapter.h"
 #include "commons_log.h"
 #include "cevent.h"
 #include "cevent_pool.h"
+#include "commons_log.h"
+
+#define LOG(...) COMMONS_LOG("POOL",__VA_ARGS__)
+
 
 #define zmalloc commons_malloc
 #define zfree commons_free
@@ -55,7 +60,11 @@ int aeApiAddEvent(ST_EVENT_LOOP *eventLoop, int fd, int mask) {
     if (mask & AE_READABLE) ee.events |= EPOLLIN;
     if (mask & AE_WRITABLE) ee.events |= EPOLLOUT;
     ee.data.fd = fd;
-    if (epoll_ctl(state->epfd,op,fd,&ee) == -1) return -1;
+    if (epoll_ctl(state->epfd,op,fd,&ee) == -1) 
+    {
+        LOG("epoll ctl failed,err:%s",strerror(errno));
+        return -1;
+    }
     return 0;
 }
 

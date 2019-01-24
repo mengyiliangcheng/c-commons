@@ -660,7 +660,7 @@ int book_ticket_model(CURL *easy_handle)
 
     for(i = 0;i < ctx->person_num;i ++)
     {
-        if(0 == strcmp(ctx->person_info[i].IdNumber,SELECT_ID))
+        if(0 == strcmp(ctx->person_info[i].IdNumber,SELECT_ID_USED))
         {
             LOG("find,%s!",ctx->person_info[i].IdNumber);
             break;
@@ -677,23 +677,23 @@ int book_ticket_model(CURL *easy_handle)
     }
     
     sprintf(post_data,
-        "param=orderAPI\
-&hospitalId=61010017\
-&patientId=%s\
-&clinicLabelId=%s\
-&clinicDate=%s \
-&timePartType=%d\
-&timePart=\
-&channcelType=%d\
-&rsvmodel=%d\
-&returnVisitId=%d\
-&symptom=\
-&cardnum=%s\
-&TimePartStartTime=%s\
-&TimePartEndTime=%s\
-&ScheduleItemCode=%s\
-&payChanel=%d\
-",
+        "param=orderAPI \
+        &hospitalId=61010017 \
+        &patientId=%s \
+        &clinicLabelId=%s \
+        &clinicDate=%s \
+        &timePartType=%d \
+        &timePart= \
+        &channcelType=%d \
+        &rsvmodel=%d \
+        &returnVisitId=%d \
+        &symptom=  \
+        &cardnum=%s \
+        &TimePartStartTime=%s \
+        &TimePartEndTime=%s \
+        &ScheduleItemCode=%s \
+        &payChanel=%d \
+        ",
         ctx->person_info[i].PersonId,
         ctx->clinic_label_id,
         ctx->clinic_date,
@@ -792,7 +792,7 @@ void open_webservice(void)
 
     while(1)
     {
-        ret = enter_doctor_interface(easy_handle,DOCTOR_ID_TEST);
+        ret = enter_doctor_interface(easy_handle,DOCTOR_ID_USED);
         if(ret != 0)
         {
             LOG("try again....");

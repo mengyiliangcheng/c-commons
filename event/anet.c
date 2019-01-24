@@ -293,6 +293,8 @@ void acceptCommonHandler(int fd, int flags, char *ip) {
 
 void freeClient(client *c)
 {
+    aeDeleteFileEvent(server.el,c->fd,AE_WRITABLE);
+    aeDeleteFileEvent(server.el,c->fd,AE_READABLE);
     close(c->fd);
     if(!c) return;
     if(c->querybuf)

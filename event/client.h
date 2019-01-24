@@ -8,14 +8,10 @@
 * limitations under the License.
 *
 */
+#ifndef __CLIENT_H__
+#define __CLIENT_H__
 
-#ifndef __UTILS_NETWORK_H__
-#define __UTILS_NETWORK_H__
-
-extern int utils_network_create_server(void);
-extern s32 utils_network_create_client(void);
-extern int utils_network_create_socket_server(void);
-
+extern int Client(char* unixSocket);
 
 
 #endif
