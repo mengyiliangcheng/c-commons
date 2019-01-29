@@ -39,6 +39,7 @@ extern int testHexToString(void);
 extern int testCurl();
 extern int testEvent(void);
 extern int testEventClient(void);
+extern int testThreadPool();
 
 #endif
 

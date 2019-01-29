@@ -456,6 +456,7 @@ ST_ANALYZE_LOG TAB_ANALYZE_LOG[] =
     {"timeout int 35 s!!!",             "hilink登录云模式超时",5},
     {"report failed:no network",        "上报失败，未拨号"},  
     {"report failed:no reg network",     "上报失败，没注网"},
+    {"report result:bad snr",            "上报失败，snr差",5},
     {"start report cache hander"        ,"触发上报"},
     {"AT+CPSMS=1, Psm Open Status"      ,"sleep模块使能psm"},
     {"AT+CPSMS=0, Psm Close Status."    ,"sleep模块关闭psm"},

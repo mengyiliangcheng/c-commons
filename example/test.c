@@ -47,6 +47,7 @@ ST_TEST_LIST TabTestList[] =
     {"testCurl",                   testCurl},
     {"testEvent",                  testEvent},
     {"testEventClient",            testEventClient},
+    {"testThreadPool",             testThreadPool},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -343,6 +344,10 @@ int testOthers()
                 __func__,ts);
 }
 
+int testThreadPool()
+{
+    thread_pool_main();
+}
 
 
 
