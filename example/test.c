@@ -14,7 +14,7 @@
 #include "utils_string.h"
 #include "osadapter.h"
 #include "utils_xml.h"
-#include "utils_network.h";
+#include "utils_network.h"
 #include "test.h"
 #include "cevent.h"
 
@@ -48,6 +48,11 @@ ST_TEST_LIST TabTestList[] =
     {"testEvent",                  testEvent},
     {"testEventClient",            testEventClient},
     {"testThreadPool",             testThreadPool},
+    {"testUtilsSignal",            testUtilsSignal},
+    {"testBinaryTree",             testBinaryTree},
+    {"testHuffmanTree",            testHuffmanTree},
+    {"testSemWait",                testSemWait},
+    {"testDynamicMem",             testDynamicMem},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -349,5 +354,29 @@ int testThreadPool()
     thread_pool_main();
 }
 
+int testUtilsSignal()
+{
+    signal_main();
+}
+
+int testBinaryTree()
+{
+    binary_tree_main();
+}
+
+int testHuffmanTree()
+{
+    huffman_tree_main();
+}
+
+int testSemWait()
+{
+    sem_wait_main();
+}
+
+int testDynamicMem()
+{
+    dynamic_mem_manage_main();
+}
 
 

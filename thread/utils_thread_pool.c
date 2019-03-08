@@ -258,10 +258,12 @@ int thread_admin_process(ST_THREAD_POOL* pool)
     if(NULL == pool)
     {
        LOG("invalid args");
+       THREAD_EXIT(NULL);
        return -4;
     }
     if(1 == pool->shutdown)
     {
+        LOG("admin shutdown....");
         THREAD_EXIT(NULL);
     }
 

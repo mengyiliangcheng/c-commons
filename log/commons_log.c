@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <time.h>
+#include <pthread.h>
 #include "commons_log.h"
 
 #define COMMONS_LOG_FILE  "./log/commons.log" 
@@ -54,11 +55,15 @@ u8* commons_get_shortname(u8* path)
     return prev;
 }
 
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER ;
 
 s32 commons_log(const u8* format, ...)
 {
     va_list ap;
     s32 ret;
+
+    pthread_mutex_lock(&lock);
+
     //static FILE *fp = NULL;
 
     //printf("[%s] ",module);
@@ -73,6 +78,7 @@ s32 commons_log(const u8* format, ...)
     printf("\n");
     //fclose(fp);
     //fp = NULL;
+    pthread_mutex_unlock(&lock);
 
     return ret;
 }

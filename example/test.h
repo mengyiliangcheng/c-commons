@@ -40,6 +40,11 @@ extern int testCurl();
 extern int testEvent(void);
 extern int testEventClient(void);
 extern int testThreadPool();
+extern int testUtilsSignal();
+extern int testBinaryTree();
+extern int testSemWait();
+extern int testHuffmanTree();
+extern int testDynamicMem();
 
 #endif
 

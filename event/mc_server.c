@@ -35,11 +35,12 @@ void initServer(void)
     server.ipfd_count = 10;
     
     /* Open the listening Unix domain socket. */
-    if (server.unixsocket != NULL) {
+    if (server.unixsocket != NULL) 
+    {
         unlink(server.unixsocket); /* don't care if this fails */
-        server.sofd = anetUnixServer(server.unixsocket,
-            server.unixsocketperm, server.tcp_backlog);
-        if (server.sofd == -1) {
+        server.sofd = anetUnixServer(server.unixsocket,server.unixsocketperm, server.tcp_backlog);
+        if (server.sofd == -1) 
+        {
             LOG("Opening Unix socket failed");
         }
         anetNonBlock(NULL,server.sofd);
