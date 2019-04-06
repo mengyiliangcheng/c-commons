@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #/**************************************************
 #*file name         :makefile
 #*descrption        : 
@@ -8,16 +8,36 @@
 #***************************************************/ 
 
 export TARGET='c-commons'
-echo $TARGET
+echo "call "$TARGET
 export INC="" 
 export SYS_INC=""
 export CC=gcc
 export COMPILE_TYPE="exe"    #exe/shared/static
 GDB=gdb
+echo ${BASH_SOURCE[0]}
+SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+echo $SCRIPT_DIR
 pwd=$PWD
 
-ARG1=$1
 
+ARG1=$1
+CMD=
+case $ARG1 in
+	-c) $SCRIPT_DIR/tools/newfile.sh -f $2
+		exit
+		;;
+	-p) $SCRIPT_DIR/tools/newproject.sh $2 $3
+		exit
+		;;
+	-g) echo "command:" $2
+		CMD=$2
+		;;
+	-p) echo "create project"
+		;;
+	*) echo "unknow cmd"
+		;;
+esac
+exit
 #cd ./network/test
 #make clean
 #make
@@ -66,7 +86,7 @@ fi
 #mv $TARGET "$TARGET.elf"
 
 EXEC=./$TARGET
-$EXEC $ARG1;
+$EXEC $CMD;
 RET=$?
 
 check_execut()
@@ -74,7 +94,7 @@ check_execut()
     if [ $1 -ne 0 ]
     then
         echo -e "\nExecute Program Failed !\n"
-        $GDB $EXEC $ARG1
+        $GDB $EXEC $CMD
     else
         echo -e "\nExecute Program Success !\n"
     fi

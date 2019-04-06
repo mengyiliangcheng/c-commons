@@ -21,7 +21,7 @@ INCLUDES= -I. \
 
 C_SOURCES= main.c
 
-CXX_SOURCES=myprint.cpp
+CXX_SOURCES=myprint.cpp hello.cpp
 
 CFLAGS=-Wall -fPIC -g
 
