@@ -18,10 +18,10 @@ pwd=$PWD
 
 ARG1=$1
 
-cd ./network/test
-make clean
-make
-RET=$?
+#cd ./network/test
+#make clean
+#make
+#RET=$?
 check_sub()
 {
     if [ $1 -eq 0 ]
@@ -33,7 +33,7 @@ check_sub()
     fi
     return 0
 }
-check_sub $RET
+#check_sub $RET
 
 cd $pwd
 
@@ -63,9 +63,9 @@ then
    mv $TARGET "$TARGET.so"
    exit 0
 fi
-mv $TARGET "$TARGET.elf"
+#mv $TARGET "$TARGET.elf"
 
-EXEC=$pwd/"$TARGET.elf"
+EXEC=./$TARGET
 $EXEC $ARG1;
 RET=$?
 

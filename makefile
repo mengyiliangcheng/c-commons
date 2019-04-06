@@ -1,72 +1,72 @@
+#!/usr/sh
 #/**************************************************
 #*file name         :makefile
 #*descrption        : 
 #*author            :pengyicheng
-#*date              :20161125
+#*date              :20190406
 #*version           :1.0
-#***************************************************/ 
+#***************************************************/
+##compiler 
+CC=gcc
+CXX=g++
+LINK=g++
+#TARGET=cross
 
-CFLAGS += -g -fPIC
-CFLAGS += -I$(shell pwd) 
-CFLAGS += -O2
-ifeq ($(COMPILE_TYPE),shared)
-    CFLAGS += -shared 
-else
-    OBJ = $(TARGET).o 
-endif
+##librarys
+DYNAMIC_LIBS= -L./xml/lib -L./libs -L./openssl/lib -lsdkxml -lsdkz -pthread
+STATIC_LIBS= ./openssl/lib/libcrypto.a ./openssl/lib/libssl.a ./libs/libcurl.a
 
-DYNAMIC_LIBS_DIR = -L./xml/lib -L./libs -L./openssl/lib
-DYNAMIC_LIBS = -lsdkxml -lsdkz -pthread #-lcrypto -lssl
-STATIC_LIBS = ./openssl/lib/libcrypto.a ./openssl/lib/libssl.a ./libs/libcurl.a
+#include files
+INCLUDES=   -I. \
+			-I./mempool \
+			-I./string \
+			-I./example \
+			-I./osadapter \
+			-I./string \
+			-I./log \
+			-I./file \
+			-I./json \
+			-I./test \
+			-I./time \
+			-I./algorithm \
+			-I./xml/inc \
+			-I./xml/include \
+			-I./thread \
+			-I./includes \
+			-I./zlib/contrib/minizip \
+			-I./openssl/include \
+			-I./network \
+			-I./event
 
-CUR_PWD=$(shell pwd)
+#c source code
+C_SOURCES= $(wildcard *.c) $(wildcard */*.c) $(wildcard */src/*.c)
 
-export HEAD_DIR = -I./mempool \
-           -I./string \
-           -I./example \
-           -I./osadapter \
-           -I./string \
-           -I./log \
-           -I./file \
-           -I./json \
-           -I./test \
-           -I./time \
-           -I./algorithm \
-           -I./xml/inc \
-           -I./xml/include \
-           -I./thread \
-           -I./includes \
-           -I./zlib/contrib/minizip \
-           -I./openssl/include \
-           -I./network \
-           -I./event
-           
-#SOURCES = $(wildcard *.c)
-SOURCES = $(wildcard */*.c)
-SOURCES += $(wildcard */src/*.c)
-SRC_DIR = $(SOURCES)
+#cpp source code
+CXX_SOURCES= $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */src/*.cpp)
 
-#OBJ = $(TARGET).o
-#OBJ += $(INC:%.h=%.o)
-CFLAGS += $(HEAD_DIR)
-#CFLAGS += $(DYNAMIC_LIBS_DIR)
-#CFLAGS += $(DYNAMIC_LIBS)
-#CFLAGS += $(STATIC_LIBS)
+CFLAGS=-Wall -fPIC -g
 
-OBJ += $(SRC_DIR:%.c=%.o)
-$(TARGET):$(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(DYNAMIC_LIBS_DIR) $(DYNAMIC_LIBS) $(STATIC_LIBS)
+CXXFLAGS=$(CFLAGS) -std=c++11
+
+#objects
+OBJS = $(C_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o) 
+
+all:$(TARGET)
+
+$(TARGET):$(OBJS)
+	$(LINK) $^ $(DYNAMIC_LIBS) $(CFLAGS) -o $@ $(STATIC_LIBS)
 
 %.o : %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@ 
 
-.PHONY:clean
+%.o : %.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@ 
+
+install:
+	tsxs -i -o $(TARGET)
+
 clean:
-	rm -f *.o *.out *.elf ./*/*.o ./*/*.swo* ./*/*.swp*
-	rm -rf $(OBJ)
-
-
-
-
+	rm -rf $(TARGET)
+	rm -rf $(OBJS)
 
 
