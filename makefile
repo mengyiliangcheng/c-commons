@@ -36,8 +36,8 @@ INCLUDES=   -I. \
 			-I./zlib/contrib/minizip \
 			-I./openssl/include \
 			-I./network \
-			-I./event
-
+			-I./event \
+			-I./debug
 #c source code
 C_SOURCES= $(wildcard *.c) $(wildcard */*.c) $(wildcard */src/*.c)
 

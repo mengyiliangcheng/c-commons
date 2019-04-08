@@ -13,7 +13,7 @@
 #include "commons_log.h"
 #include "binary_tree.h"
 
-#define LOG(...) COMMONS_LOG("BTREE",__VA_ARGS__);
+#define LOG(...) COMMONS_LOG("BTREE",__VA_ARGS__)
 
 
 typedef int (*visit_callback)(TREE_DATA_TYPE tree_data);

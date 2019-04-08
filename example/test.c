@@ -17,6 +17,7 @@
 #include "utils_network.h"
 #include "test.h"
 #include "cevent.h"
+#include "utils_trace.h"
 
 #ifdef USE_PRINTLN
 #define LOG commons_println
@@ -53,6 +54,7 @@ ST_TEST_LIST TabTestList[] =
     {"testHuffmanTree",            testHuffmanTree},
     {"testSemWait",                testSemWait},
     {"testDynamicMem",             testDynamicMem},
+    {"testPrintStaceFrame",        testPrintStaceFrame},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -378,5 +380,11 @@ int testDynamicMem()
 {
     dynamic_mem_manage_main();
 }
+
+int testPrintStaceFrame()
+{
+    print_stack_frame();
+}
+
 
 

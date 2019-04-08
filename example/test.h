@@ -45,6 +45,7 @@ extern int testBinaryTree();
 extern int testSemWait();
 extern int testHuffmanTree();
 extern int testDynamicMem();
+extern int testPrintStaceFrame();
 
 #endif
 

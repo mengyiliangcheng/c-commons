@@ -8,7 +8,6 @@
 #***************************************************/ 
 
 export TARGET='c-commons'
-echo "call "$TARGET
 export INC="" 
 export SYS_INC=""
 export CC=gcc
@@ -32,12 +31,15 @@ case $ARG1 in
 	-g) echo "command:" $2
 		CMD=$2
 		;;
+        -clean) echo "clean all"
+		make clean
+		exit
+ 		;;
 	-p) echo "create project"
 		;;
 	*) echo "unknow cmd"
 		;;
 esac
-exit
 #cd ./network/test
 #make clean
 #make

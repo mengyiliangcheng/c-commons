@@ -16,28 +16,7 @@
 
 #define LOG(...) COMMONS_LOG("MEM",__VA_ARGS__);
 
-typedef enum
-{
-    TRUNCK_FREE,
-    TRUNCK_OCCUPY,
-}e_trunck_tag;
-
-typedef struct WORD
-{
-    union
-    {
-        struct WORD *llink;  //head domain,previous node
-        struct WORD *uplink; //tail domain,pointing to the head of node
-    };
-    int tag;                 //trunck flag,0:free,1:occupy
-    int size;                //head domain,size of trunck
-    struct WORD *rlink;      //head domain,next node
-    
-}WORD,head,foot,*Space;
-
-#define FootLoc(p)                  (p + p->size -1)
-#define MIN_MEMORY_MARGIN           (5)
-#define MAX_MEMORY_SIZE             (10000)
+/*boundary tag method for dynamic memory manage*/
 
 Space AllocBoundTag(Space* pav,int n)
 {
@@ -204,6 +183,23 @@ void SpacePrintStruct(Space pav)
     }
     LOG("________end_________");
 }
+
+/*buddy system*/
+#define FREE_LIST_NUM  (16)
+
+typedef struct WORD_b
+{
+    struct WORD_b *llink;
+    int tag;
+    int kval;
+    struct WORD_b *rlink;
+}WORD_b;//,head;
+
+typedef struct HeadNode
+{
+    int nodesize;
+    struct WORD_b *first;
+}FreeList[FREE_LIST_NUM + 1];
 
 void dynamic_mem_manage_main(void)
 {

@@ -274,7 +274,7 @@ int aeProcessEvent(ST_EVENT_LOOP* eventLoop,int flags)
     LOG("events number:%d",numevents);
     if(eventLoop->afterSleepProc)
         eventLoop->afterSleepProc(eventLoop);
-    usleep(50000);
+    //usleep(50000);
     if(numevents > 0)
     {
         int j;
