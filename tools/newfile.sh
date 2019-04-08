@@ -25,8 +25,8 @@ echo "/*
  *">$FILE
 echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "*/" >> $FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 }
 
 ##
@@ -45,14 +45,14 @@ echo "/*
 echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "*/" >> $FILE
 echo "#include <stdio.h>" >>$FILE
-echo "\n" >>$FILE
+echo "" >>$FILE
 echo "int main()" >>$FILE
 echo "{" >>$FILE
 echo '	printf("hello world");' >>$FILE
 echo "	return 0;" >>$FILE
 echo "}" >>$FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 }
 
 ##
@@ -71,15 +71,15 @@ echo "/*
 echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "*/" >> $FILE
 echo "#include <iostream>" >>$FILE
-echo "\n" >>$FILE
+echo "" >>$FILE
 echo "using namespace std;" >>$FILE
 echo "int main()" >>$FILE
 echo "{" >>$FILE
 echo '	cout << "hello world" <<endl;' >>$FILE
 echo "	return 0;" >>$FILE
 echo "}" >>$FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 }
 
 ##
@@ -103,11 +103,11 @@ echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >
 echo "*/" >> $FILE
 echo "#ifndef "$MACRO >> $FILE
 echo "#define "$MACRO >> $FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 echo "#endif" >> $FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 }
 
 ##
@@ -124,8 +124,8 @@ echo "#*descrption        :
 echo "# this file is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "#***************************************************/" >> $FILE
 echo "echo filename:" $FILENAME >> $FILE
-echo "\n" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
+echo "" >> $FILE
 }
 
 ##
@@ -140,7 +140,7 @@ echo "#*descrption        :
 #*version           :1.0">>$FILE
 echo "# this file is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "#***************************************************/" >> $FILE
-echo "\n" >> $FILE
+echo "" >> $FILE
 }
 
 FILETYPE=$1
@@ -151,7 +151,7 @@ case $FILETYPE in
 		;;
 	-f) MAIN_FLAGS=NO
 		;;
-	*) echo "file type is error"
+	*) echo "file type is error,your input" $FILETYPE " " $FILENAME
 	   echo "[usage] newfile.sh [-m|-f] filename"
 	   echo "[usage] -m create a main file including main function"
 	   echo "[usage] -f create a simple file excluding main function"
@@ -170,7 +170,7 @@ FILE_NAME=${FILENAME%.*}
 FILE_EXTENSION=${FILENAME##*.}
 
 case $FILE_EXTENSION in
-	c) echo "you will create a c file"
+        c) echo "you will create a c file"
 		if [ $MAIN_FLAGS = "NO" ]
 		then
 			create_c_file $FILENAME
@@ -178,7 +178,7 @@ case $FILE_EXTENSION in
 			create_cmain_file $FILENAME
 		fi
 		;;
-    cpp) echo "you will create a cpp file"
+        cpp) echo "you will create a cpp file"
 		if [ $MAIN_FLAGS = "NO" ]
 		then
 			create_c_file $FILENAME
@@ -186,7 +186,7 @@ case $FILE_EXTENSION in
 			create_cppmain_file $FILENAME
 		fi
 		;;
-	h)  echo "you will create a cpp file"
+        h)  echo "you will create a cpp file"
 		create_c_inc_file $FILENAME
 		;;
 	sh) echo "you will create a shell file"

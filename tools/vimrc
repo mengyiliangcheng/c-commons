@@ -1,0 +1,61 @@
+"使用说明：："
+"将该文件放入到~目录下，然后修改文件名为.vimrc即可·"
+set number
+set expandtab
+set tabstop=8
+set shiftwidth=4
+set softtabstop=4
+set autoindent
+:syntax on
+"补全设置，不设也能用
+"let Tlist_Ctags_Cmd='/usr/bin/ctags'
+"filetype plugin indent on
+"filetype plugin on
+"set ofu=syntaxcomplete#Complete
+""这个是我喜欢的，一旦一行的字符超出80个的话就把那些字符的背景设为红色
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929 
+match OverLength /\%81v.\+/
+
+
+""""""""""Quickly Run"""""""""""""""""""" 
+map <F5> :call CompileRunGcc()<CR> 
+func! CompileRunGcc() 
+    "相当于在vim里面执行命令w，即保存文件"
+    exec "w"  
+if &filetype == 'c' 
+    exec "!g++ % -o %<" 
+    exec "!time ./%<" 
+elseif &filetype == 'cpp' 
+    exec "!g++ % -o %<" 
+    exec "!time ./%<" 
+elseif &filetype == 'java' 
+    exec "!javac %" 
+    exec "!time java %<" 
+elseif &filetype == 'sh' 
+    :!time bash % 
+elseif &filetype == 'python' 
+    exec "!time python2.7 %" 
+elseif &filetype == 'html' 
+    exec "!firefox % &" 
+elseif &filetype == 'go' " 
+    exec "!go build %<" 
+    exec "!time go run %" 
+endif 
+    endfunc
+
+"""""""""""""Quickly Run For c-common""""""""""""""""""
+map <F6> :call CompileRunMake() <CR>
+func! CompileRunMake()
+    exec "w"
+if &filetype == 'c'
+    exec "make"
+    exec "! ./%<"
+elseif &filetype == 'cpp'
+    exec "!make"
+    exec "! ./%<"
+endif
+    endfunc
+
+
+
+
