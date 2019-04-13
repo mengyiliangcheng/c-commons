@@ -350,6 +350,7 @@ int child_process()
     }
 
     shmdt(gstBattleData);
+    exit(0);
     return 0;
 }
 

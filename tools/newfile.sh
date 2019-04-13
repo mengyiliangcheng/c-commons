@@ -6,9 +6,10 @@
 #*date              :20190406
 #*version           :1.0
 #***************************************************/
-
+ 
 VERSION=1.0
 TOOLNAME=newfile.sh
+DATETIME="`date '+%Y/%m/%d'`"
 
 ##
 ##创建c文件
@@ -23,7 +24,7 @@ echo "/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *">$FILE
-echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
+echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" in " $DATETIME "automatic" >> $FILE
 echo "*/" >> $FILE
 echo "" >> $FILE
 echo "" >> $FILE
@@ -42,7 +43,7 @@ echo "/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *">$FILE
-echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
+echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" in " $DATETIME " automatic" >> $FILE
 echo "*/" >> $FILE
 echo "#include <stdio.h>" >>$FILE
 echo "" >>$FILE
@@ -68,7 +69,7 @@ echo "/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *">$FILE
-echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
+echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" in " $DATETIME "automatic" >> $FILE
 echo "*/" >> $FILE
 echo "#include <iostream>" >>$FILE
 echo "" >>$FILE
@@ -99,7 +100,7 @@ echo "/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *">$FILE
-echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
+echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" in " $DATETIME "automatic" >> $FILE
 echo "*/" >> $FILE
 echo "#ifndef "$MACRO >> $FILE
 echo "#define "$MACRO >> $FILE
@@ -119,8 +120,8 @@ echo "#!/bin/sh
 echo "#*file name         :"$FILENAME >> $FILE
 echo "#*descrption        :
 #*author            :pengyicheng
-#*date              :20190406
-#*version           :1.0">>$FILE
+#*date              :"$DATETIME >> $FILE
+echo "#*version           :1.0">>$FILE
 echo "# this file is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "#***************************************************/" >> $FILE
 echo "echo filename:" $FILENAME >> $FILE
@@ -136,8 +137,8 @@ echo "#/**************************************************" >$FILE
 echo "#*file name         :"$FILENAME >>$FILE
 echo "#*descrption        :
 #*author            :pengyicheng
-#*date              :20190406
-#*version           :1.0">>$FILE
+#*date              :"$DATETIME >>$FILE
+echo "#*version           :1.0">>$FILE
 echo "# this file is created by tool:"$TOOLNAME" VER:"$VERSION" automatic" >> $FILE
 echo "#***************************************************/" >> $FILE
 echo "" >> $FILE
@@ -151,10 +152,11 @@ case $FILETYPE in
 		;;
 	-f) MAIN_FLAGS=NO
 		;;
-	*) echo "file type is error,your input" $FILETYPE " " $FILENAME
+	*) echo "[ERROR] file type is error,your input" $FILETYPE " " $FILENAME
 	   echo "[usage] newfile.sh [-m|-f] filename"
-	   echo "[usage] -m create a main file including main function"
-	   echo "[usage] -f create a simple file excluding main function"
+	   echo "        -m) create a main file including main function"
+	   echo "        -f) create a simple file excluding main function"
+           exit
 		;;
 esac
 
