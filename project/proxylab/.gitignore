@@ -1,0 +1,17 @@
+# Temporary files
+*~
+._*
+core
+
+# Generated files
+*.o
+proxy
+proxylab-handin.tar
+handin.tar
+
+# Pxydrive files
+logs
+source_files
+response_files
+results.log
+get_files
