@@ -57,8 +57,7 @@ endif
     endfunc
 
 
-
-ckly Run For c-common""""""""""""""""""
+"""""""""""""Quickly Run For c-common""""""""""""""""""
 map <F7> :call CompileRunMake() <CR>
 func! CompileRunMake()
     exec "w"
