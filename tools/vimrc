@@ -58,4 +58,14 @@ endif
 
 
 
+ckly Run For c-common""""""""""""""""""
+map <F7> :call CompileRunMake() <CR>
+func! CompileRunMake()
+    exec "w"
+if &filetype == 'c'
+    exec "!./compiler.sh"
+elseif &filetype == 'cpp'
+    exec "!./compiler.sh"
+endif
+    endfunc
 
