@@ -1,0 +1,4 @@
+1001      zhangsan      88  89  90
+1002      lisi          87  91  92
+1003      wangwu        78  80  87
+1004      zhaoliu       88  81  92
