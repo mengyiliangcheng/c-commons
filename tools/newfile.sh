@@ -47,10 +47,14 @@ echo " * this licence is created by tool:"$TOOLNAME" VER:"$VERSION" in " $DATETI
 echo "*/" >> $FILE
 echo "#include <stdio.h>" >>$FILE
 echo "" >>$FILE
+echo "#define LOG(format, ...) do { \\" >>$FILE
+echo "                                printf(\"%s:%s/%s|%d::%d::\"format,\"LOG\",__FILE__,__func__,__LINE__,getpid(),##__VA_ARGS__); \\" >>$FILE
+echo "                                printf(\"\n\"); \\" >>$FILE
+echo "                            }while(0)" >> $FILE
 echo "int main()" >>$FILE
 echo "{" >>$FILE
-echo '	printf("hello world");' >>$FILE
-echo "	return 0;" >>$FILE
+echo '    printf("hello world");' >>$FILE
+echo "    return 0;" >>$FILE
 echo "}" >>$FILE
 echo "" >> $FILE
 echo "" >> $FILE
@@ -76,8 +80,8 @@ echo "" >>$FILE
 echo "using namespace std;" >>$FILE
 echo "int main()" >>$FILE
 echo "{" >>$FILE
-echo '	cout << "hello world" <<endl;' >>$FILE
-echo "	return 0;" >>$FILE
+echo '    cout << "hello world" <<endl;' >>$FILE
+echo "    return 0;" >>$FILE
 echo "}" >>$FILE
 echo "" >> $FILE
 echo "" >> $FILE

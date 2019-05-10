@@ -91,7 +91,7 @@ void doit(int connfd)
     sscanf(buf,"%s %s %s",method,uri,version); /*read the client request line*/
 
     if(strcasecmp(method,"GET")){
-        printf("Proxy does not implement the method");
+        printf("Proxy does not implement the method:%d\n",method);
         return;
     }
     /*parse the uri to get hostname,file path ,port*/
