@@ -253,6 +253,7 @@ int parent_process()
                     PARENT_LOG("child win with %d bombs",gstBattleData->child_bomb_num);
                     gstBattleData->step = GAME_EXIT;
                     gstBattleData->parent_ready = 1;
+                    gstBattleData->child_ready = 1;
                 }
                 else if(1 == gstBattleData->victory)
                 {
@@ -264,6 +265,8 @@ int parent_process()
         }
     }
 
+    PARENT_LOG("parent exit..");
+    wait(NULL);
     shmdt(gstBattleData);
     shmctl(shmid,IPC_RMID,NULL);
     return 0;
@@ -349,6 +352,7 @@ int child_process()
         }
     }
 
+    CHILD_LOG("child will exit..");
     shmdt(gstBattleData);
     exit(0);
     return 0;
