@@ -46,6 +46,7 @@ int main()
     int ret = 0;
     int id = 0;
     int type = 0;
+    int param = 0;
     FS_DL_Msg st_fota;
 
     id = msgget(FOTA_MSG_KEY,IPC_EXCL |IPC_CREAT | 0666);
@@ -75,9 +76,23 @@ int main()
             getchar();
             continue;
         }
+        printf("pls input param:");
+        ret = scanf("%d",&param);
+        if(ret < 0)
+        {
+            LOG("Scanf Failed,err:%d\n",errno);
+            continue;
+        }
+        else if (ret == 0)
+        {
+            LOG("No Matched Characters\n");
+            getchar();
+            continue;
+        }
         memset(&st_fota,0,sizeof(st_fota));
         st_fota.msgType = FG_MSG_TYPE_I;
         st_fota.infoType = type;
+        st_fota.param1 = param;
         LOG("id:%d data size:%d",id,sizeof(st_fota)-sizeof(long));
         ret = msgsnd(id,(void*)&st_fota,sizeof(st_fota)-sizeof(long),00004000);
         if(ret < 0)
