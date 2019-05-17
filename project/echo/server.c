@@ -11,13 +11,13 @@
 */
 #include <stdio.h>
 #include <errno.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define LOG(format, ...) do { \
                                 printf("%s:%s/%s|%d::%d::"format,"SERVER",__FILE__,__func__,__LINE__,getpid(),##__VA_ARGS__); \
@@ -25,13 +25,13 @@
                             }while(0)
 #define SOCK_PORT   23643
 
-static void client_handler(void* socketfd);
+static void client_handler(int socketfd);
 
 int setopt(int fd)
 {
     int on = 1;
-    int keep_alive = 1;
-    int keep_interval = 5;
+    //int keep_alive = 1;
+    //int keep_interval = 5;
     /* 允许地址重用 */
     if((setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)))<0)
     {
@@ -43,12 +43,12 @@ int setopt(int fd)
     return 0;
 }
 
-int main()
+int main(int argc,char* argv[])
 {
+    int port = 0;
     int fd_server;
     int fd_tmp;
     int ret;
-    int on = 1;
     struct sockaddr_in addr_in;
     struct sockaddr_in addr_client;
 
@@ -59,12 +59,20 @@ int main()
         LOG("create socket failed! err:%d",errno);
         return -1;
     }
-    setopt(fd_server);    
+    setopt(fd_server);
+
+    if(NULL != argv[1] && strlen(argv[1]) > 0)
+    {
+        port = atoi(argv[1]);
+    }else
+    {
+        port = SOCK_PORT; 
+    }
 
     memset(&addr_in,0,sizeof(addr_in));
     addr_in.sin_family = AF_INET;
     addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr_in.sin_port = htons(SOCK_PORT);
+    addr_in.sin_port = htons(port);
     
     /* 将fd和地址绑定 */
     fd_tmp = bind(fd_server,(struct sockaddr*)(&addr_in),sizeof(addr_in));
@@ -85,8 +93,9 @@ int main()
     /* 等待客户端连接 */
     while(1)
     {
-        LOG("wait for new connection on port:%d....",SOCK_PORT);
+        LOG("wait for new connection on port:%d....",port);
         int client_len = sizeof(addr_client);
+        /* 等待客户端连接 */
         int fd = accept(
                         fd_server,
                         (struct sockaddr *)&addr_client,
@@ -98,25 +107,12 @@ int main()
             return -1;
         }
         
+        /* 打印客户端ip地址和端口 */
         char* client_ip = inet_ntoa(addr_client.sin_addr);
         int client_port = ntohs(addr_client.sin_port);
         LOG("client ip:%s port:%d",client_ip,client_port);
-#if ENABLE_THREAD
-        pthread_t thread_id;
-        ret = pthread_create(
-                            &thread_id,
-                            NULL,
-                            (void*)client_handler,
-                            (void*)fd
-                            );
-        if(ret < 0)
-        {   
-            LOG("create thread failed,ret:%d err:%d",ret,errno);
-            break;
-        }
-#else
+        /* 处理客户端的连接请求 */
         client_handler(fd);
-#endif
     }
     ret = shutdown(fd_server,SHUT_WR);
     if(ret < 0)
@@ -131,20 +127,20 @@ int main()
 }
 
 
-static void client_handler(void* socketfd)
+static void client_handler(int socketfd)
 {
-    int fd = (int*)socketfd;
+    int fd = socketfd;
     int read_bytes;
     int write_bytes;
     char buffer[1024];
     char writebuf[1024];
-    const char* echo = "ok";
     
     while(1)
     {
         memset(buffer,0,sizeof(buffer));
         memset(writebuf,0,sizeof(writebuf));
 
+        /* 读取客户端数据 */
         read_bytes = read(fd,buffer,1024);
         if(read_bytes == 0)
         {
@@ -161,6 +157,7 @@ static void client_handler(void* socketfd)
         printf("CLIENT >%s\n",buffer);
         printf("INPUT  >");
         scanf("%s",writebuf);
+        /* 将数据发送到客户端 */
         write_bytes = write(fd,writebuf,strlen(writebuf));
         if(write_bytes < 0)
         {
@@ -172,11 +169,7 @@ static void client_handler(void* socketfd)
 
     LOG("close the connection....");
     close(fd);
-#ifdef ENABLE_THREAD
-    pthread_detach(pthread_self());
-    pthread_exit(NULL);
-#endif
-    return 0;
+    return ;
 }
 
 

@@ -12,7 +12,7 @@ CXX=g++
 LINK=g++
 TARGET=client server
 ##librarys
-DYNAMIC_LIBS= -lpthread
+DYNAMIC_LIBS=
 STATIC_LIBS=
 
 INCLUDES= -I. 	  -I../

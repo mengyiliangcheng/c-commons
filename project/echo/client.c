@@ -18,15 +18,17 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define LOG(format, ...) do { \
                                 printf("%s:%s/%s|%d::%d::"format,"LOG",__FILE__,__func__,__LINE__,getpid(),##__VA_ARGS__); \
                                 printf("\n"); \
                             }while(0)
 
+#define SERVER_PORT 23643
+#define SERVER_IP  "127.0.0.1"
 
-
-int main()
+int main(int argc,char* argv[])
 {
     int fd = 0;
     int port = 0;
@@ -36,6 +38,7 @@ int main()
     char writebuf[1024] = {0};
     struct sockaddr_in server_addr;
 
+    /* 创建套接字 */
     fd = socket(AF_INET,SOCK_STREAM,0);
     if(fd < 0)
     {
@@ -43,15 +46,31 @@ int main()
        return -1;
     }
 
-    port = 23643;
-    strcat(ip,"127.0.0.1");
+    if(NULL != argv[2] && strlen(argv[2]) > 0)
+    {
+        port = atoi(argv[2]);
+    }
+    else
+    {
+        port = SERVER_PORT;
+    }
 
+    if(NULL != argv[1] && strlen(argv[1]) > 0)
+    {
+        strncpy(ip,argv[1],sizeof(ip));
+    }
+    else
+    {
+        strcat(ip,SERVER_IP);
+    }
     memset(&server_addr,0,sizeof(server_addr));
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     inet_aton(ip,&server_addr.sin_addr);
 
+    printf("Connect To %s:%d\n",ip,port);
+    /* 连接服务器 */
     ret = connect(fd,(struct sockaddr *)&server_addr,sizeof(server_addr));
     if(ret < 0)
     {
@@ -60,6 +79,7 @@ int main()
         return -1;
     }
 
+    /* 和服务器交互 */
     while(1)
     {
         memset(readbuf,0,sizeof(readbuf));
@@ -67,15 +87,17 @@ int main()
         printf("INPUT >");
         scanf("%s",writebuf);
 
+        /* 如果用户输入quit或者exit，客户端则退出 */
         if(0 == strncmp("quit",writebuf,4)
         || 0 == strncmp("exit",writebuf,4))
         {
-            //write(fd,writebuf,strlen(writebuf));
             printf("Bye bye~\n");
             break;
         }
 
+        /* 将用户输入发送到服务器 */
         write(fd,writebuf,strlen(writebuf));
+        /* 等待服务器端回复 */
         ret = read(fd,readbuf,sizeof(readbuf));
         if(ret < 0)
         {
