@@ -22,5 +22,7 @@
  extern BOOL file_exist(s8* file_path);
 
  extern s32 utils_file_size(s8* file_path);
+
+ extern s32 file_copy_f(s8* src_path,s8* dest_path);
  
  #endif

@@ -19,33 +19,39 @@ typedef struct
 
 
 extern void testProgramUI(void);
-extern int testStringToHex();
-extern int testCommonsScanf();
-extern int testMempool();
-extern int testCommonsRandStr();
-extern int testFileSaveOverlap();
-extern int testCrc8();
-extern int testFileCopy();
-extern int testReadXMl();
-extern int testFilePackage();
-extern int testCbcEncrypt();
-extern int testAnalyzeLog();
-extern int testOthers();
-extern int testConvertTime();
-extern int testThreadCond();
-extern int testCreateServer();
-extern int testCreateClient();
-extern int testHexToString(void);
-extern int testCurl();
-extern int testEvent(void);
-extern int testEventClient(void);
-extern int testThreadPool();
-extern int testUtilsSignal();
-extern int testBinaryTree();
-extern int testSemWait();
-extern int testHuffmanTree();
-extern int testDynamicMem();
-extern int testPrintStaceFrame();
+extern void testStringToHex();
+extern void testCommonsScanf();
+extern void testMempool();
+extern void testCommonsRandStr();
+extern void testFileSaveOverlap();
+extern void testCrc8();
+extern void testFileCopy();
+extern void testReadXMl();
+extern void testFilePackage();
+extern void testCbcEncrypt();
+extern void testAnalyzeLog();
+extern void testOthers();
+extern void testConvertTime();
+extern void testThreadCond();
+extern void testCreateServer();
+extern void testCreateClient();
+extern void testHexToString(void);
+extern void testCurl();
+extern void testEvent(void);
+extern void testEventClient(void);
+extern void testThreadPool();
+extern void testUtilsSignal();
+extern void testBinaryTree();
+extern void testSemWait();
+extern void testHuffmanTree();
+extern void testDynamicMem();
+extern void testPrintStaceFrame();
+extern void testStringIsDigit();
+extern void testStringSplit();
+extern void testFileCopyFast();
+extern void testCreateProcess();
+extern void sigint_handler(int signum);
+extern void testSignal();
 
 #endif
 

@@ -15,7 +15,7 @@
 
 //#define LOG_USE_PRINTLN
 
-extern u8* commons_get_shortname(u8* path);
+extern char* commons_get_shortname(u8* path);
 
 #define COMMONS_LOG1(module,format, ... ) do{ \
         commons_log(module,"%s|%d::"format,commons_get_shortname(__FILE__),__LINE__,##__VA_ARGS__); \

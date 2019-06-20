@@ -12,7 +12,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <errno.h>
+#include "osadapter.h"
 #include <utils_string.h>
 #include "utils_file.h"
 #include "digest.h"
@@ -20,6 +26,9 @@
 #include "zip.h"
 
 #define LOG(...) COMMONS_LOG("UTILS_FILE",__VA_ARGS__);
+
+
+
 
  
 /**
@@ -187,6 +196,106 @@ s32 file_copy(s8* src_path,s8* dest_path)
     fclose(fp_dest);
     
     return 0;
+}
+
+#define PAGE_SIZE 4096
+s32 file_copy_f(s8* src_path,s8* dest_path)
+{
+    int src_fd;
+    int dest_fd;
+    int i ;
+    size_t file_size;
+    size_t write_bytes;
+    size_t block_size;
+    void* src_ptr = NULL;
+    void* dest_ptr = NULL;
+    struct stat file_stat;
+    CHECK_PARAM(src_path,NULL,-1);
+    CHECK_PARAM(dest_path,NULL,-1);
+
+    src_fd = open(src_path,O_RDONLY);
+    if(src_fd <0)
+    {
+        LOG("can not open %s,err:%d",src_path,errno);
+        return -2;
+    }
+
+    dest_fd = open(dest_path,O_RDWR | O_CREAT | O_TRUNC,0644);
+    if(dest_fd < 0)
+    {
+        LOG("can not open %s,err:%d",dest_path,errno);
+        close(src_fd);
+        return -2;
+    }
+
+    if(fstat(src_fd,&file_stat) < 0)
+    {
+        LOG("can not get stat %s,err:%d",src_path,errno);
+        close(src_fd);
+        close(dest_fd);
+        return -3;
+    }
+
+    file_size = file_stat.st_size;
+
+    lseek(src_fd,0,SEEK_SET);  /* 指向文件头 */
+    commons_println("get file size %d",file_size);
+
+    lseek(dest_fd,file_size-1,SEEK_CUR);
+    write(dest_fd,"0",1);   /* 需要先写，否则会导致mmap后的memcpy出现bus error */
+
+    i = 0;
+    write_bytes = 0;
+    block_size = PAGE_SIZE;
+    while(write_bytes < file_size)
+    {
+        if(file_size > (write_bytes+PAGE_SIZE))
+        {
+            block_size = PAGE_SIZE;
+        }else
+        {
+            block_size = file_size - write_bytes;
+        }
+        //commons_println("start write block(%d) writed(%d)",i++,write_bytes);
+        src_ptr = mmap(
+                       NULL,            /* start：最好从地址start开始的区域创建虚拟内存，通常被定为NULL，由系统分配 */
+                       block_size,      /* length:需要申请的虚拟内存大小 */
+                       PROT_READ,       /* prot:这个区域的页面可读 */
+                       MAP_SHARED,      /* flags：被映射的是共享对象 */
+                       src_fd,          /* fd:文件描述符 */
+                       write_bytes      /* offset：从文件的offset处开始读 */
+                       );
+        if(MAP_FAILED == src_ptr)  /* 返回-1，代表失败 */
+        {
+            LOG("mmap failed,err:%d",errno);
+            close(src_fd);
+            close(dest_fd);
+            return -4;
+        }
+
+        dest_ptr = mmap(NULL,block_size,PROT_WRITE,MAP_SHARED,dest_fd,write_bytes);
+        if(MAP_FAILED == dest_ptr)
+        {
+            LOG("mmap failed,err:%d",errno);
+            close(src_fd);
+            close(dest_fd);
+            munmap(src_ptr,file_size);
+            return -4;
+        }
+
+        memcpy(dest_ptr,src_ptr,block_size);
+        write_bytes += block_size;
+
+        munmap(src_ptr,block_size);
+        munmap(dest_ptr,block_size);
+    }
+    close(src_fd);
+    close(dest_fd);
+
+    //sync();
+
+    return 0;
+
 }
 
 void file_remove(s8* file_path)

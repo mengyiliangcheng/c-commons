@@ -19,6 +19,8 @@
 #define LOG(...) COMMONS_LOG("SIGNAL",__VA_ARGS__);
 
 typedef void (*signal_handler)(void* args);
+typedef void (*sighandler_t)(int);
+
 
 void signal_none(void)
 {
@@ -78,6 +80,24 @@ signal_handler signal_set(int sig,signal_handler func,int mask)
 
     return oldact.sa_handler;
 }
+
+sighandler_t Signal(int signum,sighandler_t handler)
+{
+    struct sigaction action,old_action;
+
+    action.sa_handler = handler;
+    sigemptyset(&action.sa_mask); /* sa_mask：中断执行过程中的信号阻塞集合 */
+                                 /* 如果全为空，则说明不阻塞信号，则在中断期间会处理其他信号,但不会处理相同信号 */
+                                 /* 如果全为1，则说明阻塞所有信号，只有等该信号处理完以后才会处理其他信号 */
+    action.sa_flags = SA_RESTART; /* 在中断执行完之后，尽量恢复系统调用 */
+
+    if(sigaction(signum,&action,&old_action) < 0)
+    {
+        fprintf(stderr,"Signal error,%d",errno);
+    }
+    return old_action.sa_handler;
+}
+
 
 #include <unistd.h>
 #include <stdio.h>

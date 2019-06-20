@@ -13,7 +13,8 @@
 
 #include "commons_type.h"
 
-extern u8* commons_get_shortname(u8* path);
+extern char* commons_get_shortname(u8* path);
+extern s32 commons_log(const u8* format, ...);
 
 #define COMMONS_LOG1(module,format, ... ) do{ \
         commons_log(module,"%s|%d::"format,commons_get_shortname(__FILE__),__LINE__,##__VA_ARGS__); \

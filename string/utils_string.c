@@ -13,8 +13,19 @@
 #include <limits.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "osadapter.h"
 #include "utils_string.h"
+
+#define CHECK_PARAM(param,invalid_value,retval) do{ \
+                                                if(param == invalid_value) \
+                                                { \
+                                                    Assert(0);\
+                                                    return retval;\
+                                                }\
+                                          }while(0)
+
+#define MAXLINE     10240
 
 //static u8 hex_table[16] = {'1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
@@ -293,8 +304,6 @@ void strings_replace(char *str1,char *str2,char *str3)
 /*截取src字符串中,从下标为start开始到end-1(end前面)的字符串保存在dest中(下标从0开始)*/  
 void strings_substringxx(char *dest,char *src,int start,int end)  
 {
-    
-    
     s32 i = start;
     if(start > strings_len(src))
         return;
@@ -411,6 +420,64 @@ void strings_trim(char *str)
     strings_rtrim(str);
 }
 
+/* 判断是否是数字 */
+bool strings_isdigit(char c)
+{
+    return (c >= '0' && c <= '9' ? true : false);
+}
+
+/* 字符串切割,返回一个指针数组 */
+char** strings_split(const char* str,char delim)
+{
+    char* buf = NULL;
+    char** result = NULL;
+    int len;
+    int i;
+    int index;
+    int size;
+    bool first;
+    CHECK_PARAM(str,NULL,NULL);
+
+    len = strlen(str);
+    if(len > MAXLINE)
+    {
+        return NULL;
+    }
+
+    buf = commons_malloc(len + 1);
+
+    for(i = 0;i < len ;i ++)
+    {
+        if(delim != *str)
+            break;
+        str++;
+    }
+    strings_copy(buf,str,sizeof(buf));
+
+    first = true;
+    size = 32;
+    result = (char**)commons_malloc(size*sizeof(char*));
+    for(index = 0;i < len ;i ++,buf++)
+    {
+        if(first && (delim != *buf))
+        {
+            result[index++] = buf;
+            first = false;
+        }else if(delim == *buf)
+        {
+            *buf = 0x00;
+            first = true;
+        }
+        if(index > size)
+        {
+            size += size;
+            result = (char**)commons_realloc(result,size*sizeof(char*));
+        }
+    }
+
+    result[index] = NULL;
+    return result;
+}
 
 ST_UTILS_STRINGS* strings_new()
 {

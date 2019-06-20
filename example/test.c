@@ -10,14 +10,18 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "commons_log.h"
 #include "utils_string.h"
 #include "osadapter.h"
+#ifdef SUPPORT_XML
 #include "utils_xml.h"
+#endif
 #include "utils_network.h"
 #include "test.h"
 #include "cevent.h"
 #include "utils_trace.h"
+#include "utils_thread.h"
 
 #ifdef USE_PRINTLN
 #define LOG commons_println
@@ -25,22 +29,31 @@
 #define LOG(...) COMMONS_LOG("MAIN",__VA_ARGS__);
 #endif
 
+#define CMD_PROMPT  " > "
+
 ST_TEST_LIST TabTestList[] =
 {
 #if 1
     {"test strings_to_hex",        testStringToHex},
+    {"test strings_isdigit",       testStringIsDigit},
+    {"test string split",          testStringSplit},
     {"test mempool",               testMempool },
     {"test commons_scanf",         testCommonsScanf},
     {"test commons_rand_str",      testCommonsRandStr},
     {"test file_save_overlap",     testFileSaveOverlap},
     {"test utils_cal_crc_8",       testCrc8},
     {"test file_copy",             testFileCopy},
+    {"test File Copy Fast",        testFileCopyFast},
     {"test package",               testFilePackage},
+#ifdef SUPPORT_XML
     {"test read xml",              testReadXMl},
+#endif
     {"test others",                testOthers},
     {"testCbcEncrypt",             testCbcEncrypt},
     {"testAnalyzeLog",             testAnalyzeLog},
     {"testConvertTime",            testConvertTime},
+    {"testSignal",                 testSignal},
+    {"testCreateProcess",          testCreateProcess},
     {"testThreadCond",             testThreadCond},
     {"testCreateServer",           testCreateServer},
     {"testCreateClient",           testCreateClient},
@@ -79,7 +92,7 @@ int testProgramProcess(void)
     char buffer[128];
     int num;
     testProgramUI();
-    commons_println("please select item:");
+    commons_print(CMD_PROMPT);
     while(1)
     {
         memset(buffer,0,sizeof(buffer));
@@ -107,18 +120,88 @@ int testProgramProcess(void)
             goto CONTINUE;
             continue;
         }
+        commons_println("%02d:%s",num,TabTestList[num - 1].dispName);
         TabTestList[num - 1].fun();
         goto CONTINUE;
 
 CONTINUE:
-        commons_println("please select item:");
+        commons_print(CMD_PROMPT);
 
     }
     return 0;
 }
 
+void testStringIsDigit()
+{
+    char c;
+    char buffer[128];
+    int ret = 0;
+    char* p = NULL;
 
-int testStringToHex()
+    commons_println("please input:");
+    commons_flush(stdin);
+    scanf("%c",&c);
+
+    commons_println("char is:%c,result:%d",c,strings_isdigit(c));
+
+    c = '0';
+    commons_println("char is:0,result:%d",strings_isdigit(c));
+
+    c = '1';
+    commons_println("char is:1,result:%d",strings_isdigit(c));
+
+    c = '9';
+    commons_println("char is:9,result:%d",strings_isdigit(c));
+
+    c = 'a';
+    commons_println("char is:a,result:%d",strings_isdigit(c));
+
+    c = ' ';
+    commons_println("char is:`blank`,result:%d",strings_isdigit(c));
+
+    c = '\0';
+    commons_println("char is:`null`,result:%d",strings_isdigit(c));
+}
+
+void testStringSplit()
+{
+    int i = 0;
+    char buf[1024];
+    char delim;
+    char** res = NULL;
+    commons_println("pls input string:");
+    scanf("%s",buf);
+    commons_println("pls input delim:0-blank 1-,");
+    scanf("%d",&i);
+    if(i == 0)
+    {
+        delim = ' ';
+    }else if(i == 1)
+    {
+        delim = ',';
+    }else
+    {
+        delim = ' ';
+    }
+    commons_println("delim:%c,string:%s",delim,buf);
+    res = strings_split(buf,delim);
+    if(res == NULL)
+    {
+        commons_println("failed!!!");
+    }
+
+    while(res[i] != 0)
+    {
+        commons_println("%s",res[i]);
+        i++;
+    }
+
+    free(res);
+    free(res[0]);
+
+}
+
+void testStringToHex()
 {
     int i = 0;
     int ret;
@@ -135,10 +218,9 @@ int testStringToHex()
     }
     commons_print_hex(buffer,strlen(input) / 2 + strlen(input) % 2);
 
-    return 0;
 }
 
-int testHexToString(void)
+void testHexToString(void)
 {
     char key1[]={ 0x08,0x09,0x0b,0x00,0x00,0x03,0x08,0x00,0x0a,0x03, \
                                         0x0f,0x01,0x01,0x0f,0x01,0x0a,0x0f,0x06,0x02,0x00, \
@@ -151,7 +233,7 @@ int testHexToString(void)
     commons_println("buffer:%s",buffer);
 }
 
-int testCommonsScanf()
+void testCommonsScanf()
 {
     s8 tmp[256] = {0};
     s32 ret;
@@ -163,7 +245,7 @@ int testCommonsScanf()
     commons_println("input: %s",tmp);
 }
 
-int testMempool()
+void testMempool()
 {
     int ret;
     char* ptr = NULL;
@@ -187,7 +269,7 @@ int testMempool()
 }
 
 
-int testCommonsRandStr()
+void testCommonsRandStr()
 {
     int len = 512;
     char tmp[1025] = {0};
@@ -195,7 +277,7 @@ int testCommonsRandStr()
     commons_println(tmp);
 }
 
-int testFileSaveOverlap()
+void testFileSaveOverlap()
 {
     char path[] = "./tmp.txt";
     char buf[] = "helloworld";
@@ -204,7 +286,7 @@ int testFileSaveOverlap()
     LOG("save file:%d",ret);
 }
 
-int testCrc8()
+void testCrc8()
 {
     char buf[] = {1,2,3};
     u8 crc;
@@ -212,12 +294,43 @@ int testCrc8()
     LOG("crc:%d",crc);
 }
 
-int testFileCopy()
+void testFileCopy()
 {
     file_copy("./c-commons.elf","./hello.txt");
 }
 
-int testReadXMl()
+void testFileCopyFast()
+{
+#include <time.h>
+
+    time_t start = time(NULL);
+    file_copy_f("./visio.iso","./hello.bin");
+    file_copy_f("./visio.iso","./hello.bin");
+    file_copy_f("./visio.iso","./hello.bin");
+    file_copy_f("./visio.iso","./hello.bin");
+    time_t end = time(NULL);
+    commons_println("start:%d,end:%d",start,end);
+
+    start = time(NULL);
+    file_copy("./visio.iso","./hello.bin");
+    file_copy("./visio.iso","./hello.bin");
+    file_copy("./visio.iso","./hello.bin");
+    file_copy("./visio.iso","./hello.bin");
+    end = time(NULL);
+
+    commons_println("start:%d,end:%d",start,end);
+
+    start = time(NULL);
+    system("cp -rf ./visio.iso ./hello.bin");
+    system("cp -rf ./visio.iso ./hello.bin");
+    system("cp -rf ./visio.iso ./hello.bin");
+    system("cp -rf ./visio.iso ./hello.bin");
+    end = time(NULL);
+
+    commons_println("start:%d,end:%d",start,end);
+}
+#ifdef SUPPORT_XML
+void testReadXMl()
 {
     char* content = NULL;
     content = utils_xml_read_node("./xml/ca.xml","www.baidu.com");
@@ -229,13 +342,14 @@ int testReadXMl()
     commons_println("value:%s",content);
     free(content);
 }
+#endif
 
-int testFilePackage()
+void testFilePackage()
 {
     file_package("./commons_type.h","commons_type-compress");
 }
 
-int testCbcEncrypt()
+void testCbcEncrypt()
 {
     int i;
 #if 0
@@ -274,53 +388,91 @@ int testCbcEncrypt()
     commons_print_hex_no_space(org_data,sizeof(org_data));
 }
 
-int testAnalyzeLog()
+void testAnalyzeLog()
 {
     analyze_log_client();
 }
 
-int testConvertTime()
+void testConvertTime()
 {
     utils_time_convert();
 }
 
-int testThreadCond()
+void testThreadCond()
 {
     utils_thread_cond();
 }
 
 #include<signal.h>
-int testSignal()
+void testSignal()
 {
-    pid_t pid;
-    pid = getPidByName("testThread.elf");
-    LOG("pid:%d",pid);
-    kill(pid,SIGRTMIN+10);
+    //pid_t pid;
+    //pid = getPidByName("testThread.elf");
+    //LOG("pid:%d",pid);
+    //kill(pid,SIGRTMIN+10);
+    signal(SIGINT,sigint_handler);
+    int ret = sleep(100);
+    commons_println("ret:%d err:%d",ret,errno);
+    signal(SIGINT,SIG_DFL);
 }
 
-int testCreateThread()
+void sigint_handler(int signum)
 {
-    utils_thread_create_process("./thread/test/testThread.elf");
+    commons_println("sig interp");
+}
+
+void testCreateProcess()
+{
+    char path[128];
+    char cmd[128];
+    int block;
+    commons_println("pls input process path:");
+    scanf("%s",path);
+    commons_println("pls input process cmd:");
+    scanf("%s",cmd);
+    commons_println("pls input select block(0/not 1/yes):");
+    scanf("%d",&block);
+
+    commons_println("path:[%s] cmd:[%s] block[%d]",path,cmd,block);
+
+    signal(SIGINT,sigint_handler);
+    //utils_thread_create_process_block(path,cmd);
+
+    if(block == 0)
+    {
+        utils_thread_create_process(path,cmd);
+    }else
+    {
+        utils_thread_create_process_block(path,cmd);
+    }
+
+    signal(SIGINT,SIG_DFL);
+
+}
+
+void testCreateThread()
+{
+    utils_thread_create_process("./thread/test/testThread.elf",NULL);
     sleep(3);
     testSignal();
 }
 
-int testCreateServer()
+void testCreateServer()
 {
-    utils_thread_create_process("./network/test/testServer.elf");
+    utils_thread_create_process("./network/test/testServer.elf",NULL);
 }
 
-int testEvent(void)
+void testEvent(void)
 {
     serverMain();
 }
 
-int testEventClient(void)
+void testEventClient(void)
 {
     Client("/tmp/mc_socket");
 }
 
-int testCreateClient()
+void testCreateClient()
 {
     int semid;
     semid = utils_thread_init_sem();
@@ -333,12 +485,12 @@ int testCreateClient()
     utils_thread_p(semid,0);
 }
 
-int testCurl()
+void testCurl()
 {
     open_webservice();
 }
 
-int testOthers()
+void testOthers()
 {
 
     time_t ts,time_offset;
@@ -351,37 +503,37 @@ int testOthers()
                 __func__,ts);
 }
 
-int testThreadPool()
+void testThreadPool()
 {
     thread_pool_main();
 }
 
-int testUtilsSignal()
+void testUtilsSignal()
 {
     signal_main();
 }
 
-int testBinaryTree()
+void testBinaryTree()
 {
     binary_tree_main();
 }
 
-int testHuffmanTree()
+void testHuffmanTree()
 {
     huffman_tree_main();
 }
 
-int testSemWait()
+void testSemWait()
 {
     sem_wait_main();
 }
 
-int testDynamicMem()
+void testDynamicMem()
 {
     dynamic_mem_manage_main();
 }
 
-int testPrintStaceFrame()
+void testPrintStaceFrame()
 {
     print_stack_frame();
 }

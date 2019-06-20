@@ -34,7 +34,7 @@ char* utils_time_get_timestamp(void)
     return time_stream;
 }
 
-u8* commons_get_shortname(u8* path)
+char* commons_get_shortname(u8* path)
 {
     u8* prev;
     u8* split;

@@ -13,10 +13,10 @@
 
 #include "pthread.h"
 
-extern u32 utils_thread_create_process(s8* file);
+extern s32 utils_thread_create_process(s8* file,char* cmdline);
 extern pthread_t utils_thread_create_thread(void* (*func)(void *),void* args);
-
-
+extern s32 utils_thread_create_process_block(char* file,char* cmdline);
+extern void utils_thread_sigchld_handler(int signum);
 
 
 

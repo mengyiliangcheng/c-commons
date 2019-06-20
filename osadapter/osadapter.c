@@ -87,6 +87,8 @@ s32 commons_logger(const s8* format, ...)
     //fp = NULL;
 
     pthread_mutex_unlock(&commons_log_lock);
+
+    return 0;
 }
 
 
@@ -101,6 +103,19 @@ s32 commons_println(const s8* format, ...)
     vprintf(format,ap);
     va_end(ap);
     printf("\n");
+
+    return 0;
+}
+
+s32 commons_print_args(char* argv[])
+{
+    while(argv != NULL && *argv != NULL)
+    {
+        printf("%s\n",*argv);
+        argv++;
+    }
+
+    return 0;
 }
 
 s32 commons_print(const s8* format, ...)
@@ -109,6 +124,8 @@ s32 commons_print(const s8* format, ...)
     va_start(ap,format);
     vprintf(format,ap);
     va_end(ap);
+
+    return 0;
 }
 
 s32 commons_print_hex(const void* src,s32 src_len)
@@ -149,11 +166,18 @@ s32 commons_print_hex_no_space(const void* src,s32 src_len)
 
 void commons_flush(FILE *fp)
 {
+#ifdef UNIX_LIKE
+    setbuf(stdin, NULL);
+#else
     int ch;
     if(NULL == fp){
         return ;
     }
-	while( (ch = fgetc(fp)) != EOF && ch != '\n');
+	while( (ch = fgetc(fp)) != EOF && ch != '\n' && ch != 0x0a)
+    {
+        printf("read:%02X",ch);
+    }
+#endif
 }
 
 
@@ -198,7 +222,6 @@ s32 commons_scanf(s8* dest,const s32 dest_len,const s32 type)
     //commons_print_hex(&type,10);
     //commons_print_hex(&input_type,10);
 
-    
     i = 0;
     dest_ptr = dest;
     len = 0;
@@ -254,12 +277,18 @@ void* commons_malloc(s32 size)
 	ptr = malloc(size);
     if(!ptr)
     {
+        Assert(0);
         return NULL;
     }
 
     commons_memset(ptr,0,size);
-    
+
     return ptr;
+}
+
+void* commons_realloc(void* p,s32 size)
+{
+    return realloc(p,size);
 }
 
 void commons_free(void* ptr)

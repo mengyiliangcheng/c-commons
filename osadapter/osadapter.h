@@ -28,6 +28,13 @@
 
 #define UNUSED(V) ((void) V)
 
+#define CHECK_PARAM(param,invalid_value,retval) do{ \
+                                                if(param == invalid_value) \
+                                                { \
+                                                    Assert(0);\
+                                                    return retval;\
+                                                }\
+                                          }while(0)
 
 typedef enum
 {

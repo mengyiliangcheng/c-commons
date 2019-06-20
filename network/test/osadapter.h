@@ -40,6 +40,8 @@ typedef enum
 
 extern void* commons_malloc(s32 size);
 
+extern void* commons_realloc(void* p,s32 size);
+
 extern void commons_free(void* ptr);
 
 extern void commons_memset(void* dest,s32 ch,s32 count);
@@ -47,6 +49,8 @@ extern void commons_memset(void* dest,s32 ch,s32 count);
 extern s32 commons_println(const char* format, ...);
 
 extern s32 commons_print_hex(const void* src,int src_len);
+
+extern s32 commons_print_args(char* argv[]);
 
 extern int commons_rand();
 
