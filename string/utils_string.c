@@ -426,6 +426,33 @@ bool strings_isdigit(char c)
     return (c >= '0' && c <= '9' ? true : false);
 }
 
+/* ÅÐ¶ÏÊÇ·ñÊÇ¿Õ°××Ö·û */
+bool strings_isspace(char c)
+{
+    return( 
+            (0x20 == c         //space
+            || 0x09 == c       //TAB
+            || 0x0a == c       //LF
+            || 0x0b == c       //VT
+            || 0x0c == c       //FF
+            || 0x0d == c       //CR
+            ) ? true : false );
+}
+
+/* ×Ö·û´®¸´ÖÆ */
+char* strings_dup(char* str)
+{
+    int len = 0;
+    char* s = NULL;
+    CHECK_PARAM(str, NULL, NULL);
+
+    len = strings_len(str);
+    s = commons_malloc(len+1);
+    strings_copy(s,str,len + 1);
+
+    return s;
+}
+
 /* ×Ö·û´®ÇÐ¸î,·µ»ØÒ»¸öÖ¸ÕëÊý×é */
 char** strings_split(const char* str,char delim)
 {

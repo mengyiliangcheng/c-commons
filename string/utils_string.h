@@ -14,6 +14,7 @@
 
 #define UTILS_STRINGS_API_2
 
+#include <stdbool.h>
 #include "string.h"
 #include "osadapter.h"
 
@@ -56,6 +57,8 @@ typedef struct
 extern s32 strings_to_hex(const u8* src,s32 src_len,u8* dest);
 /* 字符串切割,返回一个指针数组 */
 extern char** strings_split(const char* str,char delim);
+/* 判断是否是空白字符 */
+extern bool strings_isspace(char c);
 
 
 

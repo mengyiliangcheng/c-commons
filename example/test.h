@@ -17,6 +17,12 @@ typedef struct
     int (*fun)(void);
 }ST_TEST_LIST;
 
+typedef struct
+{
+    char* cmd;
+    int (*func)(char* cmd,void* args);
+}ST_BUILDIN_CMD;
+
 
 extern void testProgramUI(void);
 extern void testStringToHex();
@@ -52,6 +58,12 @@ extern void testFileCopyFast();
 extern void testCreateProcess();
 extern void sigint_handler(int signum);
 extern void testSignal();
+extern void testCreateThread();
+extern void testStringIssapce();
+extern int unixBuildInCmd(char* cmd,void* args);
+extern int buildin_helpDisplay(char* cmd,void* args);
+extern int buildin_exit(char* cmd,void* args);
+extern int buildin_showProgram(char* cmd,void* args);
 
 #endif
 

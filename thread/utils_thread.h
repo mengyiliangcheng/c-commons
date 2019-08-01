@@ -13,8 +13,17 @@
 
 #include "pthread.h"
 
+typedef enum
+{
+    E_THREAD_SUCC = 0,                    /* 成功 */
+    E_THREAD_ERR = -1,                    /* 失败 */
+    E_THREAD_PARAM_ERR = -2,              /* 参数错误 */
+    E_THREAD_AGAIN = -3,                  /* 稍后重试 */
+}E_THREADPOOL_ERRCODE;
+
+
 extern s32 utils_thread_create_process(s8* file,char* cmdline);
-extern pthread_t utils_thread_create_thread(void* (*func)(void *),void* args);
+extern int utils_thread_create_thread(pthread_t *thread,void* (*start_routine)(void *),void* args,int stacksize);
 extern s32 utils_thread_create_process_block(char* file,char* cmdline);
 extern void utils_thread_sigchld_handler(int signum);
 

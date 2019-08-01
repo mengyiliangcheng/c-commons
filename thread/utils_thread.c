@@ -26,6 +26,9 @@
 
 #define BUF_SIZE        1024
 #define MAX_ARGS_NUM    32
+/* 线程guard堆栈大小 */
+#define THREAD_GUARDER_STACK_SIZE       (1*1000)
+
 
 extern char **environ;  /* 环境变量 */
 
@@ -236,17 +239,67 @@ s32 utils_thread_create_process_block(char* file,char* cmdline)
     return 0;
 }
 
-pthread_t utils_thread_create_thread(void* (*func)(void *),void* args)
+int utils_thread_create_thread(pthread_t *thread,void* (*start_routine)(void *),void* args,int stacksize)
 {
+    pthread_attr_t attr;
     pthread_t pth;
-    
-    if(pthread_create(&pth,NULL,func,args) < 0)
+    pthread_t *pthptr;
+    size_t guardsize = 0;
+    int ret = E_THREAD_SUCC;
+
+    if(NULL == start_routine)
     {
-       LOG("create thread failed,err:%d",strerror(errno));
-       return -1;
+        return E_THREAD_ERR;
     }
-    LOG("create thread succ");
-    return pth;
+
+    do
+    {
+        if(pthread_attr_init(&attr))
+        {
+            LOG("pthread_attr_init failed,err:%d",errno);
+            return E_THREAD_ERR;
+        }
+
+        if(pthread_attr_setstacksize(&attr, stacksize) < 0)
+        {
+            LOG("pthread_attr_setstacksize failed,err:%d",errno);
+            ret = E_THREAD_ERR;
+            break; 
+        }
+
+        if(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) < 0)
+        {
+            LOG("pthread_attr_setdetachstate failed,err:%d",errno);
+            ret = E_THREAD_ERR;
+            break; 
+        }
+
+        if(pthread_attr_setguardsize(&attr,THREAD_GUARDER_STACK_SIZE))
+        {
+            LOG("pthread_attr_setguardsize failed,err:%d",errno);
+            ret = E_THREAD_ERR;
+            break; 
+        }
+
+        if(thread != NULL)
+        {
+            pthptr = thread;
+        }else
+        {
+            pthptr = &pth;
+        }
+        if(pthread_create (pthptr, &attr, start_routine, args))
+        {
+            LOG("pthread_create failed,err:%d",errno);
+            ret = E_THREAD_ERR;
+            break;
+        }
+    }while(0);
+    
+    pthread_attr_destroy(&attr);
+
+    return ret;
+
 }
 
 pthread_mutex_t count_lock;

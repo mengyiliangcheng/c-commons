@@ -27,9 +27,6 @@
 
 #define LOG(...) COMMONS_LOG("UTILS_FILE",__VA_ARGS__);
 
-
-
-
  
 /**
 *description:check file exist or not
@@ -92,7 +89,7 @@ s32 file_write(s8* file_path,s8* in,s32 len)
 typedef int (*file_find_callback) (s8* dir,s8* path);
 
 int file_find(s8* base_path,s8* file_name,file_find_callback func)
-{    
+{
     char buffer[256];
     struct dirent *dir_entry = NULL;
     struct dirent *dir_entry_next = NULL;
@@ -109,14 +106,15 @@ int file_find(s8* base_path,s8* file_name,file_find_callback func)
     while((dir_entry = readdir(dir)) != NULL)
     {
         BZERO(buffer,sizeof(buffer));
-        sprintf(buffer,"%s/%s",base_path,dir_entry->d_name);    
+        sprintf(buffer,"%s/%s",base_path,dir_entry->d_name);
         //commons_println("file name:%s",buffer);
         if(0 == strncmp(dir_entry->d_name,"..",2) || 0 == strncmp(dir_entry->d_name,".",1))
             continue;
         if(0 == strncmp(dir_entry->d_name,file_name,strlen(file_name)))
         {
             //commons_println("find!!!file name:%s",buffer);
-            func(base_path,buffer);
+            if(NULL != func)
+                func(base_path,buffer);
             continue;
         }
         if(4 == dir_entry->d_type)
@@ -213,6 +211,7 @@ s32 file_copy_f(s8* src_path,s8* dest_path)
     CHECK_PARAM(src_path,NULL,-1);
     CHECK_PARAM(dest_path,NULL,-1);
 
+    /* 打开源文件 */
     src_fd = open(src_path,O_RDONLY);
     if(src_fd <0)
     {
@@ -220,6 +219,7 @@ s32 file_copy_f(s8* src_path,s8* dest_path)
         return -2;
     }
 
+    /* 打开目标文件 */
     dest_fd = open(dest_path,O_RDWR | O_CREAT | O_TRUNC,0644);
     if(dest_fd < 0)
     {
@@ -228,6 +228,7 @@ s32 file_copy_f(s8* src_path,s8* dest_path)
         return -2;
     }
 
+    /* 查看文件大小 */
     if(fstat(src_fd,&file_stat) < 0)
     {
         LOG("can not get stat %s,err:%d",src_path,errno);
@@ -235,15 +236,17 @@ s32 file_copy_f(s8* src_path,s8* dest_path)
         close(dest_fd);
         return -3;
     }
-
     file_size = file_stat.st_size;
 
-    lseek(src_fd,0,SEEK_SET);  /* 指向文件头 */
+    /* 指向文件头 */
+    lseek(src_fd,0,SEEK_SET);
     commons_println("get file size %d",file_size);
 
+    /* 确定文件大小 */
     lseek(dest_fd,file_size-1,SEEK_CUR);
     write(dest_fd,"0",1);   /* 需要先写，否则会导致mmap后的memcpy出现bus error */
 
+    /* 通过mmap写入 */
     i = 0;
     write_bytes = 0;
     block_size = PAGE_SIZE;
@@ -542,7 +545,7 @@ s32 file_package(s8* fileNameInZip,s8* packageName)
    #endif 
 }
 
-
+#if 0
 typedef struct
 {
     char reason[128];
@@ -748,6 +751,6 @@ void analyze_log_client(void)
 {
     file_find(LOG_BASE_DIR,"tracker.log",analyze_log_callback);
 }
-
+#endif
 
  

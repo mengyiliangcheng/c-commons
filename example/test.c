@@ -10,6 +10,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <errno.h>
 #include "commons_log.h"
 #include "utils_string.h"
@@ -30,12 +31,26 @@
 #endif
 
 #define CMD_PROMPT  " > "
+#define LISTEN_FILENO  STDIN_FILENO
+#define MAX_BUF_SIZE  1024
+
+
+ST_BUILDIN_CMD gstBuildInCmd[] =
+{
+    {"ls",unixBuildInCmd},
+    {"cd",unixBuildInCmd},
+    {"list",buildin_showProgram},
+    {"exit",buildin_exit},
+    {"quit",buildin_exit},
+    {"help",buildin_helpDisplay},
+};
 
 ST_TEST_LIST TabTestList[] =
 {
 #if 1
     {"test strings_to_hex",        testStringToHex},
     {"test strings_isdigit",       testStringIsDigit},
+    {"test String Issapce",        testStringIssapce},
     {"test string split",          testStringSplit},
     {"test mempool",               testMempool },
     {"test commons_scanf",         testCommonsScanf},
@@ -53,6 +68,7 @@ ST_TEST_LIST TabTestList[] =
     {"testAnalyzeLog",             testAnalyzeLog},
     {"testConvertTime",            testConvertTime},
     {"testSignal",                 testSignal},
+    {"testCreateThread",           testCreateThread},
     {"testCreateProcess",          testCreateProcess},
     {"testThreadCond",             testThreadCond},
     {"testCreateServer",           testCreateServer},
@@ -80,7 +96,7 @@ void testProgramUI(void)
     int i = 0;
     commons_println("************c-commons test function*****************");
     for(i = 0;i < TEST_TABLE_SIZE;i ++){
-        commons_println("*%02d:%s",i+1,TabTestList[i].dispName);
+        commons_println(" *%02d:%s",i+1,TabTestList[i].dispName);
     }
     commons_println("****************************************************");
     return;
@@ -88,6 +104,84 @@ void testProgramUI(void)
 
 
 int testProgramProcess(void)
+{
+    fd_set fds;
+    int fdsize = 0;
+    int ret;
+    int num;
+    int i = 0;
+    int read_bytes;
+    char buffer[MAX_BUF_SIZE];
+
+    testProgramUI();
+    commons_print(CMD_PROMPT);
+    fflush(stdout);
+    while(1)
+    {
+        FD_ZERO(&fds);
+        FD_SET(LISTEN_FILENO,&fds);
+        fdsize = LISTEN_FILENO + 1;
+
+        ret = select(fdsize,&fds,NULL,NULL,NULL);
+        if(ret < 0)
+        {
+            commons_print("Select Failed,err:%d",errno);
+            continue;
+        }
+        else if(ret > 0)
+        {
+            if(FD_ISSET(LISTEN_FILENO, &fds))
+            {
+                memset(buffer,0,MAX_BUF_SIZE);
+                read_bytes = read(LISTEN_FILENO, buffer, MAX_BUF_SIZE - 1);
+                if(read_bytes <= 0)
+                {
+                    commons_println("read error!!! %s",strerror(errno));
+                    goto CONTINUE;
+                }
+
+                ret = commandProcess(&buffer[i]);
+                if(ret != 0)
+                {
+                    if(ret == -1)
+                        commons_println("input error!!!");
+                    goto CONTINUE;
+                }
+
+                for(i = 0;i < read_bytes;i ++)
+                {
+                    if(!strings_isspace(buffer[i]) && !strings_isdigit(buffer[i]))
+                    {
+                        commons_println("input error!!!");
+                        goto CONTINUE;
+                    }
+                }
+
+                num = atoi(buffer);
+                if(num <= 0 || num > TEST_TABLE_SIZE)
+                {
+                    commons_println("input error!!!");
+                    goto CONTINUE;
+                }
+                if(NULL == TabTestList[num - 1].fun)
+                {
+                    commons_println("no function");
+                    goto CONTINUE;
+                }
+                commons_println("%02d:%s",num,TabTestList[num - 1].dispName);
+                TabTestList[num - 1].fun();
+                goto CONTINUE;
+            }
+        }
+
+CONTINUE:
+        commons_print(CMD_PROMPT);
+        fflush(stdout);
+    }
+}
+
+
+int testProgramProcess1(void)
 {
     char buffer[128];
     int num;
@@ -131,6 +225,83 @@ CONTINUE:
     return 0;
 }
 
+int commandProcess(char* cmdline)
+{
+    int i = 0;
+    int num;
+    int cmdline_len = strlen(cmdline);
+
+    while(i < cmdline_len)
+    {
+        if(strings_isdigit(cmdline[i])) return 0;
+
+        if(strings_isspace(cmdline[i]))
+        {
+            i++;
+            continue;
+        }
+
+        for(num = 0;num < sizeof(gstBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
+        {
+            if(0 == strncmp(&cmdline[i],gstBuildInCmd[num].cmd,strlen(gstBuildInCmd[num].cmd)))
+            {
+                gstBuildInCmd[num].func(gstBuildInCmd[num].cmd,&cmdline[i+strlen(gstBuildInCmd[num].cmd)]);
+                return 1;
+            }
+        }
+        return -1;
+    }
+    return -2;
+}
+
+int unixBuildInCmd(char* cmd,void* args)
+{
+    char buf[128] = {0};
+    if(NULL == cmd)
+    {
+        return -1;
+    }
+
+    strcat(buf,cmd);
+    if(NULL != args)
+    {
+        strcat(buf," ");
+        strcat(buf,(char*)args);
+    }
+    system(buf);
+
+    return 0;
+}
+
+int buildin_showProgram(char* cmd,void* args)
+{
+    testProgramUI();
+
+    return 0;
+}
+
+int buildin_exit(char* cmd,void* args)
+{
+    exit(0);
+    return 0;
+}
+
+int buildin_helpDisplay(char* cmd,void* args)
+{
+    int num;
+    if(NULL == cmd)
+    {
+        return -1;
+    }
+
+    commons_println("support command:");
+    for(num = 0;num < sizeof(gstBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
+    {
+        commons_print("%s ",gstBuildInCmd[num].cmd);
+    }
+    commons_print("\n");
+}
+
 void testStringIsDigit()
 {
     char c;
@@ -161,6 +332,32 @@ void testStringIsDigit()
 
     c = '\0';
     commons_println("char is:`null`,result:%d",strings_isdigit(c));
+}
+
+void testStringIssapce()
+{
+    char c;
+
+    c = 0x32;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x20;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x09;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x0a;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x0b;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x0c;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+
+    c = 0x0d;
+    commons_println("char is:%02X,result:%d",c,strings_isspace(c));
 }
 
 void testStringSplit()
@@ -390,7 +587,7 @@ void testCbcEncrypt()
 
 void testAnalyzeLog()
 {
-    analyze_log_client();
+    //analyze_log_client();
 }
 
 void testConvertTime()
@@ -450,11 +647,19 @@ void testCreateProcess()
 
 }
 
+void thread_handler(void* args)
+{
+    LOG("thread handler");
+
+    sleep(100);
+    LOG("thread handler exit");
+}
+
 void testCreateThread()
 {
-    utils_thread_create_process("./thread/test/testThread.elf",NULL);
-    sleep(3);
-    testSignal();
+    pthread_t pth_id;
+    utils_thread_create_thread(&pth_id,thread_handler,NULL,10*1024);
+    LOG("pid:%p",pth_id);
 }
 
 void testCreateServer()
@@ -480,7 +685,7 @@ void testCreateClient()
     {
         return -1;
     }
-    utils_thread_create_thread((void*)utils_network_create_client,NULL);
+    //utils_thread_create_thread((void*)utils_network_create_client,NULL,10*1024);
 
     utils_thread_p(semid,0);
 }
