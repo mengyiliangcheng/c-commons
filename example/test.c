@@ -35,55 +35,55 @@
 #define MAX_BUF_SIZE  1024
 
 
-ST_BUILDIN_CMD gstBuildInCmd[] =
+ST_BUILDIN_CMD TabBuildInCmd[] =
 {
-    {"ls",unixBuildInCmd},
-    {"cd",unixBuildInCmd},
-    {"list",buildin_showProgram},
-    {"exit",buildin_exit},
-    {"quit",buildin_exit},
-    {"help",buildin_helpDisplay},
+    {"ls",              buildin_unixcmd},
+    {"cd",              buildin_unixcmd},
+    {"list",            buildin_showProgram},
+    {"exit",            buildin_exit},
+    {"quit",            buildin_exit},
+    {"help",            buildin_helpDisplay},
 };
 
 ST_TEST_LIST TabTestList[] =
 {
 #if 1
-    {"test strings_to_hex",        testStringToHex},
-    {"test strings_isdigit",       testStringIsDigit},
-    {"test String Issapce",        testStringIssapce},
-    {"test string split",          testStringSplit},
-    {"test mempool",               testMempool },
-    {"test commons_scanf",         testCommonsScanf},
-    {"test commons_rand_str",      testCommonsRandStr},
-    {"test file_save_overlap",     testFileSaveOverlap},
-    {"test utils_cal_crc_8",       testCrc8},
-    {"test file_copy",             testFileCopy},
-    {"test File Copy Fast",        testFileCopyFast},
-    {"test package",               testFilePackage},
+    {"test strings_to_hex",        0,testStringToHex},
+    {"test strings_isdigit",       0,testStringIsDigit},
+    {"test String Issapce",        0,testStringIssapce},
+    {"test string split",          0,testStringSplit},
+    {"test mempool",               0,testMempool },
+    {"test commons_scanf",         0,testCommonsScanf},
+    {"test commons_rand_str",      0,testCommonsRandStr},
+    {"test file_save_overlap",     0,testFileSaveOverlap},
+    {"test utils_cal_crc_8",       0,testCrc8},
+    {"test file_copy",             0,testFileCopy},
+    {"test File Copy Fast",        0,testFileCopyFast},
+    {"test package",               0,testFilePackage},
 #ifdef SUPPORT_XML
-    {"test read xml",              testReadXMl},
+    {"test read xml",              0,testReadXMl},
 #endif
-    {"test others",                testOthers},
-    {"testCbcEncrypt",             testCbcEncrypt},
-    {"testAnalyzeLog",             testAnalyzeLog},
-    {"testConvertTime",            testConvertTime},
-    {"testSignal",                 testSignal},
-    {"testCreateThread",           testCreateThread},
-    {"testCreateProcess",          testCreateProcess},
-    {"testThreadCond",             testThreadCond},
-    {"testCreateServer",           testCreateServer},
-    {"testCreateClient",           testCreateClient},
-    {"testHexToString",            testHexToString},
-    {"testCurl",                   testCurl},
-    {"testEvent",                  testEvent},
-    {"testEventClient",            testEventClient},
-    {"testThreadPool",             testThreadPool},
-    {"testUtilsSignal",            testUtilsSignal},
-    {"testBinaryTree",             testBinaryTree},
-    {"testHuffmanTree",            testHuffmanTree},
-    {"testSemWait",                testSemWait},
-    {"testDynamicMem",             testDynamicMem},
-    {"testPrintStaceFrame",        testPrintStaceFrame},
+    {"test others",                0,testOthers},
+    {"testCbcEncrypt",             0,testCbcEncrypt},
+    {"testAnalyzeLog",             0,testAnalyzeLog},
+    {"testConvertTime",            0,testConvertTime},
+    {"testSignal",                 100,testSignal},
+    {"testCreateThread",           0,testCreateThread},
+    {"testCreateProcess",          0,testCreateProcess},
+    {"testThreadCond",             0,testThreadCond},
+    {"testCreateServer",           0,testCreateServer},
+    {"testCreateClient",           0,testCreateClient},
+    {"testHexToString",            0,testHexToString},
+    {"testCurl",                   0,testCurl},
+    {"testEvent",                  0,testEvent},
+    {"testEventClient",            0,testEventClient},
+    {"testThreadPool",             0,testThreadPool},
+    {"testUtilsSignal",            0,testUtilsSignal},
+    {"testBinaryTree",             0,testBinaryTree},
+    {"testHuffmanTree",            0,testHuffmanTree},
+    {"testSemWait",                0,testSemWait},
+    {"testDynamicMem",             0,testDynamicMem},
+    {"testPrintStaceFrame",        0,testPrintStaceFrame},
     
 #endif
     //{"testAnalyzeLog",             testAnalyzeLog},
@@ -180,51 +180,6 @@ CONTINUE:
     }
 }
 
-
-int testProgramProcess1(void)
-{
-    char buffer[128];
-    int num;
-    testProgramUI();
-    commons_print(CMD_PROMPT);
-    while(1)
-    {
-        memset(buffer,0,sizeof(buffer));
-        commons_scanf(buffer,sizeof(buffer),SCANF_NUMBER);
-        if(0 == strlen(buffer))
-        {
-            commons_println("input error!!!");
-            goto CONTINUE;
-            continue;
-        }
-        num = atoi(buffer);
-        if(99 == num)
-        {
-            return 0;
-        }
-        if(num <= 0 || num > TEST_TABLE_SIZE)
-        {
-            commons_println("input error!!!");
-            goto CONTINUE;
-            continue;
-        }
-        if(NULL == TabTestList[num - 1].fun)
-        {
-            commons_println("no function");
-            goto CONTINUE;
-            continue;
-        }
-        commons_println("%02d:%s",num,TabTestList[num - 1].dispName);
-        TabTestList[num - 1].fun();
-        goto CONTINUE;
-
-CONTINUE:
-        commons_print(CMD_PROMPT);
-
-    }
-    return 0;
-}
-
 int commandProcess(char* cmdline)
 {
     int i = 0;
@@ -233,7 +188,7 @@ int commandProcess(char* cmdline)
 
     while(i < cmdline_len)
     {
-        if(strings_isdigit(cmdline[i])) return 0;
+        if(strings_isdigit(cmdline[i])) return 0;  //Contain digit
 
         if(strings_isspace(cmdline[i]))
         {
@@ -241,20 +196,20 @@ int commandProcess(char* cmdline)
             continue;
         }
 
-        for(num = 0;num < sizeof(gstBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
+        for(num = 0;num < sizeof(TabBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
         {
-            if(0 == strncmp(&cmdline[i],gstBuildInCmd[num].cmd,strlen(gstBuildInCmd[num].cmd)))
+            if(0 == strncmp(&cmdline[i],TabBuildInCmd[num].cmd,strlen(TabBuildInCmd[num].cmd)))
             {
-                gstBuildInCmd[num].func(gstBuildInCmd[num].cmd,&cmdline[i+strlen(gstBuildInCmd[num].cmd)]);
-                return 1;
+                TabBuildInCmd[num].func(TabBuildInCmd[num].cmd,&cmdline[i+strlen(TabBuildInCmd[num].cmd)]);
+                return 1;  //OK
             }
         }
-        return -1;
+        return -1; //No Valid Command
     }
-    return -2;
+    return -2;  //No Valid Char
 }
 
-int unixBuildInCmd(char* cmd,void* args)
+int buildin_unixcmd(char* cmd,void* args)
 {
     char buf[128] = {0};
     if(NULL == cmd)
@@ -295,9 +250,9 @@ int buildin_helpDisplay(char* cmd,void* args)
     }
 
     commons_println("support command:");
-    for(num = 0;num < sizeof(gstBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
+    for(num = 0;num < sizeof(TabBuildInCmd) / sizeof(ST_BUILDIN_CMD);num ++)
     {
-        commons_print("%s ",gstBuildInCmd[num].cmd);
+        commons_print("%s ",TabBuildInCmd[num].cmd);
     }
     commons_print("\n");
 }
