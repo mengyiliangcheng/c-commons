@@ -10,6 +10,7 @@
  * this licence is created by tool:newfile.sh VER:1.0 in  2019/08/05  automatic
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <errno.h>
@@ -30,9 +31,9 @@
 #define DEST_PORT 8000
 #define DEST_IP_ADDRESS "192.168.32.240"
 
-void* client(void* args)
+int client(void* args)
 {
-    while(1) 
+    while(1)
     {
     sleep(1);
     LOG("client start");
@@ -153,7 +154,7 @@ ST_CONNECTION* create_connection(char* host,char* port,int addrFamily)
         if (s >= 0)
         {
             print_ipaddr(p->ai_addr);
-            printf("addrlen:%d sizeof addr:%d\n",p->ai_addrlen,sizeof(struct sockaddr));
+            //printf("addrlen:%d sizeof addr:%d\n",p->ai_addrlen,sizeof(struct sockaddr));
             if (-1 == connect(s, p->ai_addr, p->ai_addrlen))
             {
                 LOG("can not connect,str:%s",strerror(errno));
@@ -186,20 +187,15 @@ ST_CONNECTION* create_connection(char* host,char* port,int addrFamily)
     return conn;
 }
 
-void* ipv6_client(void* args)
+int ipv6_client(void* args)
 {
     //char* host = "fe80::329c:23ff:fe53:3aeb";
     char* host = "::1";
     char* port = "8888";
 
-    struct addrinfo hints;
     struct addrinfo *serverinfo = NULL;
-    struct addrinfo *p = NULL;
-    struct sockaddr *sa = NULL;
 
-    int ret;
     int s;
-    int sl;
 
 #if 0
     memset(&hints,0,sizeof(struct addrinfo));
@@ -247,7 +243,7 @@ void* ipv6_client(void* args)
     if(NULL == conn)
     {
         LOG("connection failed");
-        return ;
+        return -1;
     }
     LOG("create connection succ");
 
@@ -255,11 +251,9 @@ void* ipv6_client(void* args)
     if(s < 0)
     {
         LOG("create socket failed,err:%s",strerror(errno));
-        return ;
+        return -1;
     }
     LOG("create socket succ");
-
-    int len;
 
     int send_num;
     int recv_num;
@@ -268,8 +262,7 @@ void* ipv6_client(void* args)
     int sock_fd = s;
     struct sockaddr_storage addr_server;
     int server_len;
-    sl = 28;
-    print_ipaddr(&(conn->addr));
+    print_ipaddr((struct sockaddr*)&(conn->addr));
 
     LOG("client send to :%s",send_buf);
     send_num = sendto(sock_fd,send_buf,strlen(send_buf),0,
@@ -298,7 +291,7 @@ void* ipv6_client(void* args)
         freeaddrinfo(serverinfo);
     }
 
-    return;
+    return 0;
 }
 
 
@@ -340,8 +333,9 @@ int create_socket(const char * portStr, int addressFamily)
     return s;
 }
 
-void* ipv6_server(void* args)
+int ipv6_server(void* args)
 {
+    LOG("create socket on:8888");
     int sock_fd = create_socket("8888",AF_INET6);
     
     if(sock_fd < 0)
@@ -381,7 +375,7 @@ void* ipv6_server(void* args)
         recv_buf[recv_num] = '\0';
         LOG("server receive(%d)[%s]\n",recv_num,recv_buf);
         printf("client addr len %d addr:\n",len);
-        print_ipaddr(&addr_client);
+        print_ipaddr((struct sockaddr*)&addr_client);
         send_num = sendto(sock_fd,send_buf,recv_num,0,
                     (struct sockaddr*)&addr_client,len);
         if(send_num < 0)
@@ -394,7 +388,7 @@ void* ipv6_server(void* args)
 }
 
 
-void* server(void* args)
+int server(void* args)
 {
     int sock_fd = create_socket("8000",AF_INET);
     
@@ -468,10 +462,11 @@ int main()
     pthread_t cli;
     pthread_t ser;
     int ret;
-    
+#if 0    
     ret = pthread_create(&cli,NULL,ipv6_client,NULL);
     if(ret < 0)
         printf("create thread failed");
+#endif
 #if 1
     ret = pthread_create(&ser,NULL,ipv6_server,NULL);
     if(ret < 0)
