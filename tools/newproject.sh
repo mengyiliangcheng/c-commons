@@ -44,7 +44,7 @@ echo "C_SOURCES=" $C_SOURCES >>$MAKEFILE_NAME
 echo "">>$MAKEFILE_NAME
 echo "CXX_SOURCES=" $CPP_SOURCES >>$MAKEFILE_NAME
 echo "" >>$MAKEFILE_NAME
-echo "CFLAGS=-Wall -fPIC -g" >>$MAKEFILE_NAME
+echo 'CFLAGS=-Wall -fPIC -g $(INCLUDES)' >>$MAKEFILE_NAME
 echo 'CXXFLAGS=$(CFLAGS) -std=c++11
 
 OBJS = $(C_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o) 
@@ -52,7 +52,7 @@ OBJS = $(C_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o)
 all:$(TARGET)
 
 $(TARGET):$(OBJS)
-	$(LINK) $^ $(DYNAMIC_LIBS) $(CFLAGS) -o $@
+	$(LINK) $^ $(DYNAMIC_LIBS) $(CFLAGS) -o $@ $(STATIC_LIBS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $< -o $@ 
@@ -115,6 +115,7 @@ case $PROJECT_TYPE in
 		create_cpp_project $PROJECT_NAME
 		;;
 	*) echo "error project type"
+       echo "option:[-c/-cpp]"
 		exit
 		;;
 esac
