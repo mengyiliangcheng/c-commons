@@ -51,6 +51,7 @@ ST_TEST_LIST TabTestList[] =
     {"test strings_to_hex",        0,testStringToHex},
     {"test strings_isdigit",       0,testStringIsDigit},
     {"test String Issapce",        0,testStringIssapce},
+    {"test String Isprint",        0,testStringIsprint},
     {"test string split",          0,testStringSplit},
     {"test mempool",               0,testMempool },
     {"test commons_scanf",         0,testCommonsScanf},
@@ -313,6 +314,32 @@ void testStringIssapce()
 
     c = 0x0d;
     commons_println("char is:%02X,result:%d",c,strings_isspace(c));
+}
+
+void testStringIsprint()
+{
+    unsigned char c;
+
+    c = 0x32;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0x20;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0x09;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0x8a;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0x4c;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0x2c;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
+
+    c = 0xdd;
+    commons_println("char is:%02X %c,result:%d",c,c,strings_isprint(c));
 }
 
 void testStringSplit()

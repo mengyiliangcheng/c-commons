@@ -439,6 +439,11 @@ bool strings_isspace(char c)
             ) ? true : false );
 }
 
+bool strings_isprint(char c)
+{
+    return ((c > 0x20) && (c < 0x7e) ? true : false);
+}
+
 /* ×Ö·û´®¸´ÖÆ */
 char* strings_dup(char* str)
 {

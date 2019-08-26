@@ -61,6 +61,7 @@ extern void sigint_handler(int signum);
 extern void testSignal();
 extern void testCreateThread();
 extern void testStringIssapce();
+extern void testStringIsprint();
 extern int buildin_unixcmd(char* cmd,void* args);
 extern int buildin_helpDisplay(char* cmd,void* args);
 extern int buildin_exit(char* cmd,void* args);

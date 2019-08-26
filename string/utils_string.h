@@ -60,7 +60,7 @@ extern char** strings_split(const char* str,char delim);
 /* ÅĞ¶ÏÊÇ·ñÊÇ¿Õ°××Ö·û */
 extern bool strings_isspace(char c);
 
-
+extern bool strings_isprint(char c);
 
 
 #endif
