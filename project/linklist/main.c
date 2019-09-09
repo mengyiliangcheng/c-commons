@@ -43,17 +43,19 @@ typedef struct _stTest
 stLinklist* list_add(stLinklist* head,stLinklist* node)
 {
     stLinklist* target;
-    if(NULL == head || NULL == node)
+    if(NULL == head)
     {
-        return head;
+        return node;
     }
 
-    target = head->next;
+    if(NULL == node)
+        return head;
+
+    target = head;
     if(target == NULL || target->id > node->id)
     {
         node->next = target;
-        head->next = node;
-        return head;
+        return node;
     }
 
     for(;target->next != NULL && target->next->id <= node->id ;target = target->next)
@@ -178,8 +180,6 @@ int main()
     stTest* tmp = NULL;
     int i;
     printf("hello world\n");
-
-    head = test_get();
 
     for(i = 0;i < 100;i ++)
     {

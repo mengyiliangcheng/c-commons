@@ -328,7 +328,8 @@ int create_socket(const char * portStr, int addressFamily)
         }
     }
 
-    freeaddrinfo(res);
+    if(NULL != res)
+        freeaddrinfo(res);
 
     return s;
 }
@@ -387,7 +388,7 @@ int ipv6_server(void* args)
     close(sock_fd);
 }
 
-
+#define ECHO 1
 int server(void* args)
 {
     int sock_fd = create_socket("8000",AF_INET);
@@ -427,6 +428,7 @@ int server(void* args)
     while(1)
     {
         LOG("server wait");
+        sleep(1);
         recv_num = recvfrom(
                 sock_fd,
                 recv_buf,
@@ -444,8 +446,13 @@ int server(void* args)
         recv_buf[recv_num] = '\0';
         LOG("server receive %d bytes:%s\n",recv_num,recv_buf);
 
-        send_num = sendto(sock_fd,send_buf,recv_num,0,
+#ifdef ECHO
+        send_num = sendto(sock_fd,recv_buf,recv_num,0,
                     (struct sockaddr*)&addr_client,len);
+#else
+        send_num = sendto(sock_fd,send_buf,strlen(send_buf),0,
+                    (struct sockaddr*)&addr_client,len);
+#endif
         if(send_num < 0)
         {
             LOG("send err:%d",errno);
@@ -462,13 +469,13 @@ int main()
     pthread_t cli;
     pthread_t ser;
     int ret;
-#if 0    
-    ret = pthread_create(&cli,NULL,ipv6_client,NULL);
+#if 0
+    ret = pthread_create(&cli,NULL,client,NULL);
     if(ret < 0)
         printf("create thread failed");
 #endif
 #if 1
-    ret = pthread_create(&ser,NULL,ipv6_server,NULL);
+    ret = pthread_create(&ser,NULL,server,NULL);
     if(ret < 0)
         printf("create thread failed");
 #endif
