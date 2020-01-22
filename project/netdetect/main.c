@@ -47,6 +47,7 @@ typedef struct
     ST_OPT_DATA_META port;
     ST_OPT_DATA_META sock_type;
     ST_OPT_DATA_META ip_addr;
+    ST_OPT_DATA_META payload;
 }ST_CLIENT_CONF;
 
 ST_CLIENT_CONF stClientCfg;
@@ -78,6 +79,7 @@ ST_CLIENT_OPT stClientOpt[] =
     {"-protocol",   &(stClientCfg.sock_type), OPT_TYPE_CHAR,    1,     "Protocol Requeset,[u/t] udp/tcp"},
     {"-port",       &(stClientCfg.port),      OPT_TYPE_INT,     1,     "Destination Port,[0~65535]"},
     {"-a",          &(stClientCfg.ip_addr),   OPT_TYPE_STRING,  1,     "Destination IP Address"},
+    {"-payload",    &(stClientCfg.payload),   OPT_TYPE_STRING,  1,     "Request Message Payload"},
 };
 
 void showHelp(void)
@@ -99,6 +101,7 @@ void printConf(void)
     printf("*destnation port:   %d\n",stClientCfg.port.data.asInt);
     printf("*socket type:       %c\n",stClientCfg.sock_type.data.asChar);
     printf("*ip address:        %s\n",stClientCfg.ip_addr.data.asString);
+    printf("*payload:           %s\n",stClientCfg.payload.data.asString);
     printf("*******************configure end*****************************\n");
 }
 
@@ -290,6 +293,8 @@ void initClientCfg(void)
     
     memset(stClientCfg.ip_addr.data.asString,0,sizeof(stClientCfg.ip_addr.data.asString));
     strcat(stClientCfg.ip_addr.data.asString,"www.baidu.com");
+    memset(stClientCfg.payload.data.asString,0,sizeof(stClientCfg.payload.data.asString));
+    strcat(stClientCfg.payload.data.asString,"hi,who are you?");
 }
 
 int main(int argc,char* argv[])
@@ -328,6 +333,8 @@ int main(int argc,char* argv[])
     }
 
     sprintf(port,"%d",stClientCfg.port.data.asInt);
+    memset(send_buf,0,sizeof(send_buf));
+    strcat(send_buf,stClientCfg.payload.data.asString);
 
     ST_CONNECTION* conn = create_connection(
         stClientCfg.ip_addr.data.asString,

@@ -53,6 +53,12 @@ ST_TEST_LIST TabTestList[] =
     {"test String Issapce",        0,testStringIssapce},
     {"test String Isprint",        0,testStringIsprint},
     {"test string split",          0,testStringSplit},
+    {"test string inputfix",       0,testStringInputFix},
+    {"test string to lower",       0,testStringTolower},
+    {"test string atof",           0,testStringAtof},
+    {"test string path fix",       0,testStringPathFix},
+    {"test string strdup",         0,testStringStrdup},
+    {"test string strlcpy",        0,testStringStrlcpy},
     {"test mempool",               0,testMempool },
     {"test commons_scanf",         0,testCommonsScanf},
     {"test commons_rand_str",      0,testCommonsRandStr},
@@ -141,7 +147,8 @@ int testProgramProcess(void)
                     goto CONTINUE;
                 }
 
-                ret = commandProcess(&buffer[i]);
+                LOG("i:%d buffer:%s",i,buffer);
+                ret = commandProcess(buffer);
                 if(ret != 0)
                 {
                     if(ret == -1)
@@ -258,6 +265,22 @@ int buildin_helpDisplay(char* cmd,void* args)
     commons_print("\n");
 }
 
+void testStringInputFix()
+{
+    int read_bytes;
+    char buffer[128] = {0x31,0x32,0x33,0x33,0x08,0x08,0x34,0x35,0x00};
+
+    read_bytes = strlen(buffer);
+
+    LOG("fix before");
+    commons_print_hex(buffer,strlen(buffer));
+
+    strings_inputfix(buffer);
+
+    LOG("fix after");
+    commons_print_hex(buffer,strlen(buffer));
+}
+
 void testStringIsDigit()
 {
     char c;
@@ -316,6 +339,42 @@ void testStringIssapce()
     commons_println("char is:%02X,result:%d",c,strings_isspace(c));
 }
 
+void testStringTolower()
+{
+    char c;
+
+    c = 'C';
+    commons_println("char is %c,result:%c",c,strings_tolower(c));
+    return ;
+}
+
+void testStringAtof()
+{
+    char buffer[32] = {0};
+    commons_println("pls input number");
+    scanf("%s",buffer);
+    commons_println("string:%s number:%f",buffer,strings_atof(buffer));
+
+    char latitude[128] = {0};
+    char longitude[128] = {0};
+    char altitude[128] = {0};
+    char speed[128] = {0};
+    char accuracy[128] = {0};
+    commons_println("pls input latitude;longitude;altitude;speed;accuracy");
+
+    scanf("%s %s %s %s %s",
+        latitude,
+        longitude,
+        altitude,
+        speed,
+        accuracy);
+
+    commons_println("latitude: %s,longitude: %s,altitude: %s",
+        latitude,longitude,altitude);
+
+    return ;
+}
+
 void testStringIsprint()
 {
     unsigned char c;
@@ -344,6 +403,7 @@ void testStringIsprint()
 
 void testStringSplit()
 {
+#if 0
     int i = 0;
     char buf[1024];
     char delim;
@@ -377,7 +437,66 @@ void testStringSplit()
 
     free(res);
     free(res[0]);
+#endif
+    int ret;
+    unsigned char buffer[128] = {0};
+    int i = 0;
+    char** res = NULL;
+    commons_println("pls input latitude;longitude;altitude;speed;accuracy");
 
+    ret = scanf("%s",buffer);
+    if(ret <= 0)
+    {
+        commons_println("read failed");
+        return -1;
+    }
+    commons_println("read:%s",buffer);
+
+    res = strings_split((char*)buffer,';');
+    if(NULL == res)
+    {
+        commons_println("parse failed");
+        return -1;
+    }
+
+    commons_println("parse succ");
+    while(NULL != res[i])
+    {
+        commons_println("res[%d] %s ",i,res[i]);
+        i++;
+    }
+    commons_println("print over");
+    free(res);
+
+}
+
+void testStringPathFix()
+{
+    char path[128] = {0};
+    commons_println("pls input:");
+    scanf("%s",path);
+    commons_println("before:%s",path);
+    strings_pathfix(path,sizeof(path));
+    commons_println("after:%s",path);
+}
+
+void testStringStrlcpy()
+{
+    char buf[128];
+    char dest[16];
+    commons_println("pls input:");
+    scanf("%s",buf);
+    commons_println("%d",strings_strlcpy(dest,buf,sizeof(dest)));
+    commons_println("%s",dest);
+}
+
+void testStringStrdup()
+{
+    char* str = "hello,world";
+    char* ptr;
+    ptr = strings_strdup(str);
+    commons_println("%s",ptr);
+    free(ptr);
 }
 
 void testStringToHex()

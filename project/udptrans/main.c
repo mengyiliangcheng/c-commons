@@ -151,9 +151,12 @@ int main()
         }else if(ret > 0)
         {
             memset(recvbuf,0,sizeof(recvbuf));
-            connection_recv(udp_handle->conn,recvbuf,sizeof(recvbuf));
-            ST_MG_UDP_PACKAGE* response = package_decode(recvbuf,sizeof(recvbuf));
-            transaction_response_handler(context,response);
+            ret = connection_recv(udp_handle->conn,recvbuf,sizeof(recvbuf));
+            if(ret > 0)
+            {
+                ST_MG_UDP_PACKAGE* response = package_decode(recvbuf,sizeof(recvbuf));
+                transaction_response_handler(context,response); 
+            }
         }else
         {
             transaction_process(context);

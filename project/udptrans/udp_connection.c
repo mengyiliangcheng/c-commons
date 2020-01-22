@@ -240,6 +240,6 @@ int connection_recv(ST_CONNECTION* conn,unsigned char* buf,int bufsize)
     }
     LOG("recv %d bytes",recv_num);
     udp_print_hex(buf,recv_num);
-    return 0;
+    return recv_num;
 }
 

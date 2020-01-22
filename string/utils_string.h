@@ -56,12 +56,15 @@ typedef struct
 
 extern s32 strings_to_hex(const u8* src,s32 src_len,u8* dest);
 /* 字符串切割,返回一个指针数组 */
-extern char** strings_split(const char* str,char delim);
+extern char** strings_split(char* str,char delim);
 /* 判断是否是空白字符 */
 extern bool strings_isspace(char c);
-
+extern double strings_atof(char* num);
 extern bool strings_isprint(char c);
-
+extern void strings_inputfix(char* str);
+extern void strings_pathfix(char* str,int size);
+extern char* strings_strdup(const char* str);
+extern char* strings_strlcpy(char* dest,const char* src,int size);
 
 #endif
 

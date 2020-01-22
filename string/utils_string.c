@@ -14,6 +14,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <math.h>
 #include "osadapter.h"
 #include "utils_string.h"
 
@@ -413,6 +414,99 @@ void strings_rtrim(char *str)
     str[++i]='\0';
 }
 
+#define ASCII_DEL 0x7F
+void strings_inputfix(char* str)
+{
+    int index = 0;
+    int len = 0;
+    int i = 0;
+    if(NULL == str)
+        return ;
+
+    len = strlen(str);
+
+    for(i = 0;i < len ;i ++)
+    {
+        if(ASCII_DEL == str[i])
+        {
+            if(index > 0)
+                index --;
+            continue;
+        }
+        str[index] = str[i];
+        index++;
+    }
+    str[index] = 0;
+}
+
+void strings_pathfix(char* str,int size)
+{
+    int len;
+    int i;
+    int index = 0;
+    char path[128];
+    if(NULL == str)
+        return ;
+
+    memset(path,0,sizeof(path));
+    strcat(path,"/");
+    index += 1;
+    len = strlen(str);
+    for(i = 0;i < len;i ++)
+    {
+        if('/' != str[i])
+        {
+            path[index++] = str[i];
+        }else
+        {
+            if('/' != path[index-1])
+            {
+                path[index++] = '/';
+            }
+        }
+    }
+
+    strncpy(str,path,size-1);
+    if(index > size)
+        str[size-1] = 0x00;
+    else
+        str[index] = 0x00;
+
+    return ;
+}
+
+char* strings_strlcpy(char* dest,const char* src,int size)
+{
+    int len  = strlen(src);
+    int min = 0;
+
+    if(size > 0)
+    {
+        min = (len >= size ? size - 1 : len);
+        memcpy(dest,src,min);
+        dest[min] = 0x00;
+    }
+    return len;
+}
+
+char* strings_strdup(const char* str)
+{
+    char *d;
+    int len;
+
+    if(NULL == str)
+        return NULL;
+    len = strlen (str) + 1;
+    d = malloc(len);
+    if (NULL == d) 
+        return NULL;
+
+    strings_strlcpy(d, str, len);
+
+    return d;
+}
+
+
 /*É¾³ýstrÁ½¶ËµÄ¿Õ°××Ö·û*/  
 void strings_trim(char *str)
 {
@@ -439,6 +533,31 @@ bool strings_isspace(char c)
             ) ? true : false );
 }
 
+char strings_tolower(char c)
+{
+    if ((c >= 'A') && (c <= 'Z'))
+        return c + ('a' - 'A');
+    return c;
+}
+
+double strings_atof(char* num)
+{
+    double n=0,sign=1,scale=0;int subscale=0,signsubscale=1;
+
+    if (*num=='-') sign=-1,num++;   /* Has sign? */
+    if (*num=='0') num++;           /* is zero */
+    if (*num>='1' && *num<='9') do  n=(n*10.0)+(*num++ -'0');   while (*num>='0' && *num<='9'); /* Number? */
+    if (*num=='.' && num[1]>='0' && num[1]<='9') {num++;        do  n=(n*10.0)+(*num++ -'0'),scale--; while (*num>='0' && *num<='9');}  /* Fractional part? */
+    if (*num=='e' || *num=='E')     /* Exponent? */
+    {   num++;if (*num=='+') num++; else if (*num=='-') signsubscale=-1,num++;      /* With sign? */
+        while (*num>='0' && *num<='9') subscale=(subscale*10)+(*num++ - '0');   /* Number? */
+    }
+
+    n=sign*n*pow(10.0,(scale+subscale*signsubscale));   /* number = +/- number.fraction * 10^+/- exponent */
+
+    return n;
+}
+
 bool strings_isprint(char c)
 {
     return ((c > 0x20) && (c < 0x7e) ? true : false);
@@ -459,9 +578,8 @@ char* strings_dup(char* str)
 }
 
 /* ×Ö·û´®ÇÐ¸î,·µ»ØÒ»¸öÖ¸ÕëÊý×é */
-char** strings_split(const char* str,char delim)
+char** strings_split(char* str,char delim)
 {
-    char* buf = NULL;
     char** result = NULL;
     int len;
     int i;
@@ -476,28 +594,25 @@ char** strings_split(const char* str,char delim)
         return NULL;
     }
 
-    buf = commons_malloc(len + 1);
-
     for(i = 0;i < len ;i ++)
     {
         if(delim != *str)
             break;
         str++;
     }
-    strings_copy(buf,str,sizeof(buf));
 
     first = true;
     size = 32;
     result = (char**)commons_malloc(size*sizeof(char*));
-    for(index = 0;i < len ;i ++,buf++)
+    for(index = 0;i < len ;i ++,str++)
     {
-        if(first && (delim != *buf))
+        if(first && (delim != *str))
         {
-            result[index++] = buf;
+            result[index++] = str;
             first = false;
-        }else if(delim == *buf)
+        }else if(delim == *str)
         {
-            *buf = 0x00;
+            *str = 0x00;
             first = true;
         }
         if(index > size)
